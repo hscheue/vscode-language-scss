@@ -1,19 +1,42 @@
 import {
   createConnection,
-  TextDocuments,
   ProposedFeatures,
   TextDocumentSyncKind,
+  CompletionItem,
 } from "vscode-languageserver/node";
-import { TextDocument } from "vscode-languageserver-textdocument";
+import {
+  getCompletionsFromSymbols,
+  getSymbols,
+  listen,
+} from "./language-service";
 
 const connection = createConnection(ProposedFeatures.all);
-const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 
-connection.onInitialize(() => ({
-  capabilities: {
-    textDocumentSync: TextDocumentSyncKind.Incremental,
-  },
-}));
+connection.onInitialize(() => {
+  return {
+    capabilities: {
+      textDocumentSync: TextDocumentSyncKind.Full,
+      completionProvider: { resolveProvider: false },
+    },
+  };
+});
 
-documents.listen(connection);
+connection.onCompletion(async (textDocumentPosition) => {
+  const completionItems: CompletionItem[] = [];
+
+  const { links, symbols } = await getSymbols({
+    uri: textDocumentPosition.textDocument.uri,
+  });
+
+  completionItems.push(...(await getCompletionsFromSymbols(symbols)));
+
+  for (const link of links) {
+    const { links, symbols } = await getSymbols({ link });
+    completionItems.push(...(await getCompletionsFromSymbols(symbols)));
+  }
+
+  return completionItems;
+});
+
+listen(connection);
 connection.listen();
