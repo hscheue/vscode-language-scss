@@ -3,8 +3,18 @@ import {
   ProposedFeatures,
   TextDocumentSyncKind,
 } from "vscode-languageserver/node";
-import { getConcatenatedSymbols, listen, scan } from "./documents";
+import {
+  getConcatenatedSymbols,
+  getDocumentAST,
+  listen,
+  scan,
+} from "./documents";
 import { getCompletionsFromSymbols } from "./completions";
+import {
+  getNodeAtOffset,
+  NodeType,
+  Variable,
+} from "./css-languageserver-cloned/cssNodes";
 
 const connection = createConnection(ProposedFeatures.all);
 
@@ -20,15 +30,25 @@ connection.onInitialize(() => {
 
 connection.onHover(async (hover) => {
   await scan(hover.textDocument.uri);
+  const data = getDocumentAST(hover.textDocument.uri);
+  if (!data) return null;
+
+  const offset = data.textDocument.offsetAt(hover.position);
   const symbols = getConcatenatedSymbols(hover.textDocument.uri);
-  symbols.find((symbol) => {});
+  const node = getNodeAtOffset(data.ast, offset);
+  if (!node) return null;
 
-  // 	const offset = textDocument.offsetAt(hover.position);
-  // getNodeAtOffset(ast, offset),
+  if (node.type === NodeType.VariableName) {
+    const variableNode = node as Variable;
+    const symbol = symbols.find(
+      (symbol) => symbol.name === variableNode.getName()
+    );
+    return {
+      contents: `${symbol?.name}`,
+    };
+  }
 
-  return {
-    contents: `**Hover this**`,
-  };
+  return null;
 });
 
 connection.onCompletion(async (completion) => {

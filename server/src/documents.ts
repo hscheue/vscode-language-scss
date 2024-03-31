@@ -13,6 +13,7 @@ type DocumentAST = {
   ast: Node;
   symbols: DocumentSymbol[];
   links: DocumentLink[];
+  textDocument: TextDocument;
 };
 
 type State = DocumentAST & {
@@ -28,14 +29,12 @@ const textDocuments: TextDocuments<TextDocument> = new TextDocuments(
   TextDocument
 );
 
-function _store(
-  textDocument: TextDocument,
-  { ast, links, symbols }: DocumentAST
-) {
+function _store({ ast, links, symbols, textDocument }: DocumentAST) {
   storage.set(textDocument.uri, {
     ast,
     links,
     symbols,
+    textDocument: textDocument,
     version: textDocument.version,
   });
 }
@@ -47,7 +46,7 @@ function _skip(textDocument: TextDocument): boolean {
   return true;
 }
 
-function _getTextDocument(uri: string) {
+export function _getTextDocument(uri: string) {
   const d = textDocuments.get(uri);
   if (d) return d;
   const path = URI.parse(uri).fsPath;
@@ -70,13 +69,17 @@ export async function scan(uri: string): Promise<void> {
 
   console.log(links);
 
-  _store(textDocument, { ast, symbols, links });
+  _store({ ast, symbols, links, textDocument });
 
   for (const link of links) {
     if (link.target) {
       scan(link.target);
     }
   }
+}
+
+export function getDocumentAST(uri: string) {
+  return storage.get(uri);
 }
 
 export function getConcatenatedSymbols(uri: string) {
