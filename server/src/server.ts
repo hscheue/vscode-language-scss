@@ -2,13 +2,9 @@ import {
   createConnection,
   ProposedFeatures,
   TextDocumentSyncKind,
-  CompletionItem,
 } from "vscode-languageserver/node";
-import {
-  getCompletionsFromSymbols,
-  getSymbols,
-  listen,
-} from "./language-service";
+import { getConcatenatedSymbols, listen, scan } from "./documents";
+import { getCompletionsFromSymbols } from "./completions";
 
 const connection = createConnection(ProposedFeatures.all);
 
@@ -17,25 +13,28 @@ connection.onInitialize(() => {
     capabilities: {
       textDocumentSync: TextDocumentSyncKind.Full,
       completionProvider: { resolveProvider: false },
+      hoverProvider: true,
     },
   };
 });
 
-connection.onCompletion(async (textDocumentPosition) => {
-  const completionItems: CompletionItem[] = [];
+connection.onHover(async (hover) => {
+  await scan(hover.textDocument.uri);
+  const symbols = getConcatenatedSymbols(hover.textDocument.uri);
+  symbols.find((symbol) => {});
 
-  const { links, symbols } = await getSymbols({
-    uri: textDocumentPosition.textDocument.uri,
-  });
+  // 	const offset = textDocument.offsetAt(hover.position);
+  // getNodeAtOffset(ast, offset),
 
-  completionItems.push(...(await getCompletionsFromSymbols(symbols)));
+  return {
+    contents: `**Hover this**`,
+  };
+});
 
-  for (const link of links) {
-    const { links, symbols } = await getSymbols({ link });
-    completionItems.push(...(await getCompletionsFromSymbols(symbols)));
-  }
-
-  return completionItems;
+connection.onCompletion(async (completion) => {
+  await scan(completion.textDocument.uri);
+  const symbols = getConcatenatedSymbols(completion.textDocument.uri);
+  return getCompletionsFromSymbols(symbols);
 });
 
 listen(connection);
