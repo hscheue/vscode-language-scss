@@ -3,7 +3,7 @@ import {
   CompletionItem,
   CompletionItemKind,
   DocumentLink,
-  SymbolInformation,
+  DocumentSymbol,
   SymbolKind,
   TextDocument,
   getSCSSLanguageService,
@@ -24,7 +24,7 @@ export function listen(connection: any) {
 export async function getSymbols(
   options: { uri: string } | { link: DocumentLink }
 ): Promise<{
-  symbols: SymbolInformation[];
+  symbols: DocumentSymbol[];
   links: DocumentLink[];
 }> {
   if ("uri" in options) {
@@ -47,7 +47,7 @@ export async function getSymbols(
 
 async function _parseSymbols(textDocument: TextDocument) {
   const ast = languageService.parseStylesheet(textDocument);
-  const symbols = languageService.findDocumentSymbols(textDocument, ast);
+  const symbols = languageService.findDocumentSymbols2(textDocument, ast);
   const links = await languageService.findDocumentLinks2(textDocument, ast, {
     resolveReference: (ref) => new URL(ref, textDocument.uri).toString(),
   });
@@ -59,7 +59,7 @@ async function _parseSymbols(textDocument: TextDocument) {
 }
 
 /** Get completions from symbols */
-export async function getCompletionsFromSymbols(symbols: SymbolInformation[]) {
+export async function getCompletionsFromSymbols(symbols: DocumentSymbol[]) {
   const completionItems: CompletionItem[] = [];
   for (const symbol of symbols) {
     _addVariableCompletions(completionItems, symbol);
@@ -69,7 +69,7 @@ export async function getCompletionsFromSymbols(symbols: SymbolInformation[]) {
 
 async function _addVariableCompletions(
   completionItems: CompletionItem[],
-  symbol: SymbolInformation
+  symbol: DocumentSymbol
 ) {
   if (symbol.kind !== SymbolKind.Variable) return;
 
@@ -80,15 +80,3 @@ async function _addVariableCompletions(
     documentation: "Documentation",
   });
 }
-
-/*
-for (const symbol of symbols) {
-  // const position = symbol.location.range.start;
-  // const offset = textDocument.offsetAt(symbol.location.range.start);
-
-
-name: symbol.name,
-offset,
-position,
-value: "temp", // getVariableValue(ast, offset),
-*/
