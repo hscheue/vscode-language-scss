@@ -41,8 +41,8 @@ async function _addMixinCompletions(
     label: symbol.name,
     kind: CompletionItemKind.Function,
     labelDetails: {
-      detail: " labelDetails detail ",
-      description: " labelDetails description",
+      detail: ` ${symbol.value}`,
+      description: symbol.filename,
     },
   });
 }
