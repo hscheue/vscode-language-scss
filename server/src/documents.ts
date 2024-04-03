@@ -3,16 +3,16 @@ import { URI } from "vscode-uri";
 import { TextDocuments } from "vscode-languageserver";
 import {
   DocumentLink,
-  DocumentSymbol,
   TextDocument,
   getSCSSLanguageService,
 } from "vscode-css-languageservice";
 import { Node } from "./css-languageserver-cloned/cssNodes";
 import { resolveReference } from "./resolveReference";
+import { EnhancedSymbol, enhanceSymbol } from "./enhanceSymbol";
 
 type DocumentAST = {
   ast: Node;
-  symbols: DocumentSymbol[];
+  symbols: EnhancedSymbol[];
   links: DocumentLink[];
   textDocument: TextDocument;
 };
@@ -62,7 +62,10 @@ export async function scan(uri: string): Promise<void> {
   if (_skip(textDocument)) return;
 
   const ast = languageService.parseStylesheet(textDocument) as Node;
-  const symbols = languageService.findDocumentSymbols2(textDocument, ast);
+  const _symbols = languageService.findDocumentSymbols2(textDocument, ast);
+  const symbols = _symbols.map((symbol) =>
+    enhanceSymbol(textDocument, symbol, ast)
+  );
   const links = await languageService.findDocumentLinks2(textDocument, ast, {
     resolveReference,
   });
@@ -83,7 +86,7 @@ export function getDocumentAST(uri: string) {
 }
 
 export function getConcatenatedSymbols(uri: string) {
-  const symbols: DocumentSymbol[] = [];
+  const symbols: EnhancedSymbol[] = [];
   const linkURIs = [uri];
   const set = new Set<string>();
 
@@ -106,7 +109,7 @@ function _getLinksURI(uri: string): string[] {
     .filter((l) => typeof l === "string") as string[];
 }
 
-function _getSymbols(uri: string): DocumentSymbol[] {
+function _getSymbols(uri: string): EnhancedSymbol[] {
   const data = storage.get(uri);
   if (!data) return [];
   return data.symbols;

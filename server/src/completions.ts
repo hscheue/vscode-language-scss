@@ -1,12 +1,12 @@
 import {
-  DocumentSymbol,
   CompletionItem,
   SymbolKind,
   CompletionItemKind,
 } from "vscode-css-languageservice";
+import { EnhancedSymbol } from "./enhanceSymbol";
 
 /** Get completions from symbols */
-export async function getCompletionsFromSymbols(symbols: DocumentSymbol[]) {
+export async function getCompletionsFromSymbols(symbols: EnhancedSymbol[]) {
   const completionItems: CompletionItem[] = [];
   for (const symbol of symbols) {
     _addVariableCompletions(completionItems, symbol);
@@ -17,7 +17,7 @@ export async function getCompletionsFromSymbols(symbols: DocumentSymbol[]) {
 
 async function _addVariableCompletions(
   completionItems: CompletionItem[],
-  symbol: DocumentSymbol
+  symbol: EnhancedSymbol
 ) {
   if (symbol.kind !== SymbolKind.Variable) return;
 
@@ -33,7 +33,7 @@ async function _addVariableCompletions(
 
 async function _addMixinCompletions(
   completionItems: CompletionItem[],
-  symbol: DocumentSymbol
+  symbol: EnhancedSymbol
 ) {
   if (symbol.kind !== SymbolKind.Method) return;
 
