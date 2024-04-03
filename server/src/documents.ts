@@ -70,8 +70,6 @@ export async function scan(uri: string): Promise<void> {
     resolveReference,
   });
 
-  console.log(links);
-
   _store({ ast, symbols, links, textDocument });
 
   for (const link of links) {
