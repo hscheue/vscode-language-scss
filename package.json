@@ -1,10 +1,15 @@
 {
   "name": "vscode-language-scss",
-  "version": "1.0.0",
-  "categories": [],
-  "engines": {
-    "vscode": "^1.75.0"
+  "version": "0.0.1",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/hscheue/vscode-language-scss.git"
   },
+  "engines": {
+    "vscode": "^1.78.0"
+  },
+  "categories": [],
   "activationEvents": [
     "onLanguage:scss"
   ],
@@ -14,7 +19,8 @@
     "compile": "tsc -b",
     "watch": "tsc -b -w",
     "lint": "eslint ./client/src ./server/src --ext .ts,.tsx",
-    "postinstall": "cd client && npm install && cd ../server && npm install && cd .."
+    "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
+    "ci": "(npm install); (npm run compile); (npx @vscode/vsce package)"
   },
   "devDependencies": {
     "@types/node": "^18.14.6",
