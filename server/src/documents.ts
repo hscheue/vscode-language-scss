@@ -8,6 +8,7 @@ import {
   getSCSSLanguageService,
 } from "vscode-css-languageservice";
 import { Node } from "./css-languageserver-cloned/cssNodes";
+import { resolveReference } from "./resolveReference";
 
 type DocumentAST = {
   ast: Node;
@@ -63,8 +64,7 @@ export async function scan(uri: string): Promise<void> {
   const ast = languageService.parseStylesheet(textDocument) as Node;
   const symbols = languageService.findDocumentSymbols2(textDocument, ast);
   const links = await languageService.findDocumentLinks2(textDocument, ast, {
-    resolveReference: (ref, baseUrl) =>
-      new URL(`${ref}.scss`, baseUrl).toString(),
+    resolveReference,
   });
 
   console.log(links);
