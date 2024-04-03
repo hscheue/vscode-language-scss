@@ -25,8 +25,8 @@ async function _addVariableCompletions(
     label: symbol.name,
     kind: CompletionItemKind.Variable,
     labelDetails: {
-      detail: " labelDetails detail ",
-      description: " labelDetails description",
+      detail: ` ${symbol.value}`,
+      description: symbol.filename,
     },
   });
 }

@@ -8,6 +8,7 @@ import {
 
 export type EnhancedSymbol = DocumentSymbol & {
   value?: string;
+  filename?: string;
 };
 
 export function enhanceSymbol(
@@ -20,14 +21,8 @@ export function enhanceSymbol(
 
   if (parent.type === NodeType.VariableDeclaration) {
     const value = parent.getChild(1)?.getText();
-    console.log;
-    return { ...symbol, value };
+    return { ...symbol, value, filename: textDocument.uri.split("/").at(-1) };
   }
 
-  console.log();
-  console.log();
-  console.log();
-  console.log();
-  console.log();
   return symbol;
 }
