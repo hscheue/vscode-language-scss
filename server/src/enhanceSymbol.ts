@@ -10,7 +10,7 @@ import { ParseResult } from "scss-sassdoc-parser";
 export type EnhancedSymbol = DocumentSymbol & {
   value?: string;
   filename?: string;
-  doc?: string;
+  doc?: ParseResult;
 };
 
 export function enhanceSymbol(
@@ -26,11 +26,14 @@ export function enhanceSymbol(
 
   if (parent.type === NodeType.VariableDeclaration) {
     const value = parent.getChild(1)?.getText();
-    const doc = docs.find((d) => `$${d.name}` === symbol.name)?.description;
+    const doc = docs.find((d) => `$${d.name}` === symbol.name);
+
     return { ...symbol, filename, value, doc };
   }
 
   if (node.type === NodeType.MixinDeclaration) {
+    const doc = docs.find((d) => d.name === symbol.name);
+
     const value =
       node.getChildren().length === 3 ? node.getChild(1)?.getText() : "";
 
@@ -38,6 +41,7 @@ export function enhanceSymbol(
       ...symbol,
       filename,
       value,
+      doc,
     };
   }
 
