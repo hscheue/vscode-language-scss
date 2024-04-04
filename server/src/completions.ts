@@ -2,8 +2,10 @@ import {
   CompletionItem,
   SymbolKind,
   CompletionItemKind,
+  MarkupKind,
 } from "vscode-css-languageservice";
 import { EnhancedSymbol } from "./enhanceSymbol";
+import validateColor from "validate-color";
 
 /** Get completions from symbols */
 export async function getCompletionsFromSymbols(symbols: EnhancedSymbol[]) {
@@ -23,11 +25,14 @@ async function _addVariableCompletions(
 
   completionItems.push({
     label: symbol.name,
-    kind: CompletionItemKind.Variable,
+    kind: validateColor(symbol.value ?? "")
+      ? CompletionItemKind.Color
+      : CompletionItemKind.Variable,
     labelDetails: {
       detail: ` ${symbol.value}`,
       description: symbol.filename,
     },
+    detail: symbol.value, // this powers CompletionItemKind.Color
   });
 }
 
