@@ -15,10 +15,12 @@ import {
   NodeType,
   Variable,
 } from "./css-languageserver-cloned/cssNodes";
+import { resolveSettings } from "./resolveReference";
 
 const connection = createConnection(ProposedFeatures.all);
 
-connection.onInitialize(() => {
+connection.onInitialize((params) => {
+  resolveSettings.baseURL = params.workspaceFolders?.[0].uri ?? "";
   return {
     capabilities: {
       textDocumentSync: TextDocumentSyncKind.Full,
