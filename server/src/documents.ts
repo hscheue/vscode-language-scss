@@ -9,6 +9,7 @@ import {
 import { Node } from "./css-languageserver-cloned/cssNodes";
 import { resolveReference } from "./resolveReference";
 import { EnhancedSymbol, enhanceSymbol } from "./enhanceSymbol";
+import { parse } from "scss-sassdoc-parser";
 
 type DocumentAST = {
   ast: Node;
@@ -61,10 +62,11 @@ export async function scan(uri: string): Promise<void> {
   const textDocument = _getTextDocument(uri);
   if (_skip(textDocument)) return;
 
+  const docs = await parse(textDocument.getText());
   const ast = languageService.parseStylesheet(textDocument) as Node;
   const _symbols = languageService.findDocumentSymbols2(textDocument, ast);
   const symbols = _symbols.map((symbol) =>
-    enhanceSymbol(textDocument, symbol, ast)
+    enhanceSymbol(textDocument, symbol, ast, docs)
   );
   const links = await languageService.findDocumentLinks2(textDocument, ast, {
     resolveReference,

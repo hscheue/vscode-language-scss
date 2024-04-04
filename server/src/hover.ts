@@ -24,7 +24,7 @@ export function getHoverFromSymbols(
       (symbol) => symbol.name === variableNode.getName()
     );
     return {
-      contents: `${symbol?.name}`,
+      contents: `${symbol?.name} ${symbol?.doc}`,
     };
   }
 
