@@ -11,6 +11,7 @@ import { resolveReference } from "./resolveReference";
 import { EnhancedSymbol, enhanceSymbol } from "./enhanceSymbol";
 import { parse } from "scss-sassdoc-parser";
 import type { Connection } from "./server";
+import { logMessage } from "./log";
 
 type DocumentAST = {
   ast: Node;
@@ -31,6 +32,10 @@ languageService.configure({ validate: false });
 const textDocuments: TextDocuments<TextDocument> = new TextDocuments(
   TextDocument
 );
+
+textDocuments.onDidSave((d) => {
+  scan(d.document.uri);
+});
 
 function _store({ ast, links, symbols, textDocument }: DocumentAST) {
   storage.set(textDocument.uri, {
@@ -62,6 +67,7 @@ export function _getTextDocument(uri: string) {
 export async function scan(uri: string): Promise<void> {
   const textDocument = _getTextDocument(uri);
   if (_skip(textDocument)) return;
+  logMessage(`updating document ${textDocument.uri}`);
 
   const docs = await parse(textDocument.getText());
   const ast = languageService.parseStylesheet(textDocument) as Node;
