@@ -7,11 +7,15 @@ import { getConcatenatedSymbols, listen, scan } from "./documents";
 import { getCompletionsFromSymbols } from "./completions";
 import { resolveSettings } from "./resolveReference";
 import { getHoverFromSymbols } from "./hover";
+import { registerLogger } from "./log";
 
 const connection = createConnection(ProposedFeatures.all);
 
+export type Connection = typeof connection;
+
 connection.onInitialize((params) => {
   resolveSettings.baseURL = params.workspaceFolders?.[0].uri ?? "";
+
   return {
     capabilities: {
       textDocumentSync: TextDocumentSyncKind.Full,
@@ -34,4 +38,5 @@ connection.onCompletion(async (completion) => {
 });
 
 listen(connection);
+registerLogger(connection);
 connection.listen();

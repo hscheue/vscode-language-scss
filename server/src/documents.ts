@@ -10,6 +10,7 @@ import { Node } from "./css-languageserver-cloned/cssNodes";
 import { resolveReference } from "./resolveReference";
 import { EnhancedSymbol, enhanceSymbol } from "./enhanceSymbol";
 import { parse } from "scss-sassdoc-parser";
+import type { Connection } from "./server";
 
 type DocumentAST = {
   ast: Node;
@@ -116,6 +117,6 @@ function _getSymbols(uri: string): EnhancedSymbol[] {
 }
 
 /** Attach to connection in server.ts */
-export function listen(connection: any) {
+export function listen(connection: Connection) {
   textDocuments.listen(connection);
 }
