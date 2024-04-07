@@ -83,6 +83,7 @@ export async function scan(uri: string): Promise<void> {
 
   for (const link of links) {
     if (link.target) {
+      logMessage(`linked to ${link.target}`);
       scan(link.target);
     }
   }
