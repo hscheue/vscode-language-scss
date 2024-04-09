@@ -10,6 +10,7 @@ import { ParseResult } from "scss-sassdoc-parser";
 export type EnhancedSymbol = DocumentSymbol & {
   value?: string;
   filename?: string;
+  uri?: string;
   doc?: ParseResult;
 };
 
@@ -28,7 +29,7 @@ export function enhanceSymbol(
     const value = parent.getChild(1)?.getText();
     const doc = docs.find((d) => `$${d.name}` === symbol.name);
 
-    return { ...symbol, filename, value, doc };
+    return { ...symbol, filename, uri: textDocument.uri, value, doc };
   }
 
   if (node.type === NodeType.MixinDeclaration) {
@@ -40,6 +41,7 @@ export function enhanceSymbol(
     return {
       ...symbol,
       filename,
+      uri: textDocument.uri,
       value,
       doc,
     };
