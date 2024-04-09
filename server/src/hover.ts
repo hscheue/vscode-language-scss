@@ -27,7 +27,17 @@ export function getHoverFromSymbols(
     const symbol = symbols.find((s) => s.name === name);
 
     return {
-      contents: `${symbol?.value ?? ""} ${symbol?.doc?.description ?? ""}`,
+      contents: {
+        value: [
+          "```scss",
+          `${name} ${symbol?.value ?? ""}`,
+          `${symbol?.doc?.description ?? ""}`,
+          "```",
+        ]
+          .filter(Boolean)
+          .join("\n"),
+        kind: MarkupKind.Markdown,
+      },
     };
   }
 
