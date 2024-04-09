@@ -31,8 +31,8 @@ export function getHoverFromSymbols(
         value: [
           "```scss",
           `${name} ${symbol?.value ?? ""}`,
-          `${symbol?.doc?.description ?? ""}`,
           "```",
+          `${symbol?.doc?.description ?? ""}`,
         ]
           .filter(Boolean)
           .join("\n"),
@@ -49,7 +49,17 @@ export function getHoverFromSymbols(
     const name = mixinReference.getName();
     const symbol = symbols.find((s) => s.name === name);
     return {
-      contents: symbol?.doc?.description ?? "",
+      contents: {
+        value: [
+          "```scss",
+          `@mixin ${name}`,
+          "```",
+          `${symbol?.doc?.description ?? ""}`,
+        ]
+          .filter(Boolean)
+          .join("\n"),
+        kind: MarkupKind.Markdown,
+      },
     };
   }
 
