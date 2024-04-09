@@ -2,7 +2,6 @@ import {
   CompletionItem,
   SymbolKind,
   CompletionItemKind,
-  MarkupKind,
 } from "vscode-css-languageservice";
 import { EnhancedSymbol } from "./enhanceSymbol";
 import validateColor from "validate-color";

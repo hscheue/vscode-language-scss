@@ -2,13 +2,11 @@ import { Hover, HoverParams, MarkupKind } from "vscode-languageserver";
 import { EnhancedSymbol } from "./enhanceSymbol";
 import {
   getNodeAtOffset,
-  MixinDeclaration,
   MixinReference,
   NodeType,
   Variable,
 } from "./css-languageserver-cloned/cssNodes";
 import { getDocumentAST } from "./documents";
-import { validateHTMLColorHex } from "validate-color";
 
 export function getHoverFromSymbols(
   symbols: EnhancedSymbol[],
