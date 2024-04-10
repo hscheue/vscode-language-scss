@@ -33,9 +33,13 @@ const textDocuments: TextDocuments<TextDocument> = new TextDocuments(
   TextDocument
 );
 
-textDocuments.onDidSave((d) => {
-  scan(d.document.uri);
-});
+// textDocuments.onDidSave(async (d) => {
+//   await scan(d.document.uri);
+// });
+
+// textDocuments.onDidChangeContent(async (d) => {
+//   await scan(d.document.uri);
+// });
 
 function _store({ ast, links, symbols, textDocument }: DocumentAST) {
   storage.set(textDocument.uri, {
@@ -51,7 +55,8 @@ function _skip(textDocument: TextDocument): boolean {
   const state = storage.get(textDocument.uri);
   if (typeof state?.version !== "number") return false;
   if (state.version === textDocument.version) return false;
-  return true;
+  // return true;
+  return false; // version no longer working or never worked
 }
 
 export function _getTextDocument(uri: string) {
