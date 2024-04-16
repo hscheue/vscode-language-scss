@@ -59,18 +59,24 @@ function _skip(textDocument: TextDocument): boolean {
   return false; // version no longer working or never worked
 }
 
-export function _getTextDocument(uri: string) {
-  const d = textDocuments.get(uri);
-  if (d) return d;
-  const path = URI.parse(uri).fsPath;
-  const content = readFileSync(path).toString();
-  const textDocument = TextDocument.create(uri, "scss", 1, content);
-  return textDocument;
+export function _getTextDocument(uri: string): TextDocument | undefined {
+  try {
+    const d = textDocuments.get(uri);
+    if (d) return d;
+    const path = URI.parse(uri).fsPath;
+    const content = readFileSync(path).toString();
+    const textDocument = TextDocument.create(uri, "scss", 1, content);
+    return textDocument;
+  } catch {
+    logMessage(`error on _getTextDocument: ${uri}`);
+    return undefined;
+  }
 }
 
 /** When a file changes, check all dependent scss state */
 export async function scan(uri: string): Promise<void> {
   const textDocument = _getTextDocument(uri);
+  if (!textDocument) return;
   if (_skip(textDocument)) return;
   logMessage(`updating document ${textDocument.uri}`);
 

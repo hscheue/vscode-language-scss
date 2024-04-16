@@ -1,7 +1,7 @@
 import { existsSync } from "fs";
 import { join } from "path";
 import { DocumentContext } from "vscode-css-languageservice";
-// import { logMessage } from "./log";
+import { logMessage } from "./log";
 
 export const resolveSettings = {
   baseURL: "",
@@ -11,7 +11,10 @@ export const resolveReference: DocumentContext["resolveReference"] = (
   ref,
   baseUrl
 ) => {
-  // logMessage(`ref: ${ref}; baseUrl: ${baseUrl};`);
+  if (ref.startsWith("https://") || ref.startsWith("http://")) {
+    logMessage(`ref: ${ref}; baseUrl: ${baseUrl};`);
+    return undefined;
+  }
   const r1 = resolveFor(getString(ref, baseUrl, true));
   // if (r1) logMessage(`resolved r1 ${r1}`);
   if (r1) return r1;
