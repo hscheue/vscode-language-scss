@@ -33,14 +33,6 @@ const textDocuments: TextDocuments<TextDocument> = new TextDocuments(
   TextDocument
 );
 
-// textDocuments.onDidSave(async (d) => {
-//   await scan(d.document.uri);
-// });
-
-// textDocuments.onDidChangeContent(async (d) => {
-//   await scan(d.document.uri);
-// });
-
 function _store({ ast, links, symbols, textDocument }: DocumentAST) {
   storage.set(textDocument.uri, {
     ast,
@@ -53,10 +45,12 @@ function _store({ ast, links, symbols, textDocument }: DocumentAST) {
 
 function _skip(textDocument: TextDocument): boolean {
   const state = storage.get(textDocument.uri);
+  // logMessage(`${textDocument.version} -- ${state?.version}`);
   if (typeof state?.version !== "number") return false;
   if (state.version === textDocument.version) return false;
-  // return true;
-  return false; // version no longer working or never worked
+  /** Overwritten dist files don't increment version nor triggers onDidChange */
+  if (textDocument.uri.includes("/node_modules/")) return false;
+  return true;
 }
 
 export function _getTextDocument(uri: string): TextDocument | undefined {
@@ -137,4 +131,12 @@ function _getSymbols(uri: string): EnhancedSymbol[] {
 /** Attach to connection in server.ts */
 export function listen(connection: Connection) {
   textDocuments.listen(connection);
+
+  textDocuments.onDidSave(async (d) => {
+    await scan(d.document.uri);
+  });
+
+  textDocuments.onDidChangeContent(async (d) => {
+    await scan(d.document.uri);
+  });
 }
