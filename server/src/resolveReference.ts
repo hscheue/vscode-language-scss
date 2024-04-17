@@ -2,10 +2,7 @@ import { existsSync } from "fs";
 import { join } from "path";
 import { DocumentContext } from "vscode-css-languageservice";
 import { logMessage } from "./log";
-
-export const resolveSettings = {
-  baseURL: "",
-};
+import { settings } from "./settings";
 
 export const resolveReference: DocumentContext["resolveReference"] = (
   ref,
@@ -23,10 +20,10 @@ export const resolveReference: DocumentContext["resolveReference"] = (
   if (r2) return r2;
 
   // poor solution to get resolveSettings.baseURL working
-  const b1 = resolveFor(getString(ref, resolveSettings.baseURL + "/t", true));
+  const b1 = resolveFor(getString(ref, settings.baseURL + "/t", true));
   // if (b1) logMessage(`resolved b1 ${b1}`);
   if (b1) return b1;
-  const b2 = resolveFor(getString(ref, resolveSettings.baseURL + "/t", false));
+  const b2 = resolveFor(getString(ref, settings.baseURL + "/t", false));
   // if (b2) logMessage(`resolved b2 ${b2}`);
   if (b2) return b2;
 
@@ -43,7 +40,7 @@ export const resolveReference: DocumentContext["resolveReference"] = (
   }
 
   // poor solution to get node_modules paths working
-  const baseUrlModules = join(resolveSettings.baseURL, "node_modules", "src");
+  const baseUrlModules = join(settings.baseURL, "node_modules", "src");
   if (baseUrlModules) {
     // logMessage(`baseUrlModules ${baseUrlModules}`);
     const m1 = resolveFor(getString(ref, baseUrlModules, true, true));

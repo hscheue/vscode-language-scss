@@ -12,6 +12,7 @@ import { EnhancedSymbol, enhanceSymbol } from "./enhanceSymbol";
 import { parse } from "scss-sassdoc-parser";
 import type { Connection } from "./server";
 import { logMessage } from "./log";
+import { settings } from "./settings";
 
 type DocumentAST = {
   ast: Node;
@@ -44,6 +45,9 @@ function _store({ ast, links, symbols, textDocument }: DocumentAST) {
 }
 
 function _skip(textDocument: TextDocument): boolean {
+  const enableCaching =
+    settings.workspaceSettings?.experimental?.caching === "enabled";
+  if (!enableCaching) return false;
   const state = storage.get(textDocument.uri);
   // logMessage(`${textDocument.version} -- ${state?.version}`);
   if (typeof state?.version !== "number") return false;

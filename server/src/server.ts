@@ -5,17 +5,17 @@ import {
 } from "vscode-languageserver/node";
 import { getConcatenatedSymbols, listen, scan } from "./documents";
 import { getCompletionsFromSymbols } from "./completions";
-import { resolveSettings } from "./resolveReference";
 import { getHoverFromSymbols } from "./hover";
 import { registerLogger } from "./log";
 import { getDefinitionFromSymbols } from "./definition";
+import { settings } from "./settings";
 
 const connection = createConnection(ProposedFeatures.all);
 
 export type Connection = typeof connection;
 
 connection.onInitialize((params) => {
-  resolveSettings.baseURL = params.workspaceFolders?.[0].uri ?? "";
+  settings.baseURL = params.workspaceFolders?.[0].uri ?? "";
 
   return {
     capabilities: {
@@ -25,6 +25,14 @@ connection.onInitialize((params) => {
       definitionProvider: true,
     },
   };
+});
+
+connection.onInitialized(async () => {
+  const workspaceSettings = await connection.workspace.getConfiguration({
+    scopeUri: settings.baseURL,
+    section: "vscode-language-scss",
+  });
+  settings.workspaceSettings = workspaceSettings;
 });
 
 connection.onHover(async (hover) => {

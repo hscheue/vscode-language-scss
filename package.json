@@ -29,5 +29,23 @@
     "@typescript-eslint/parser": "^7.1.0",
     "eslint": "^8.57.0",
     "typescript": "^5.3.3"
+  },
+  "contributes": {
+    "configuration": {
+      "title": "vscode-language-scss",
+      "type": "object",
+      "properties": {
+        "vscode-language-scss.experimental.caching": {
+          "scope": "resource",
+          "type": "string",
+          "enum": [
+            "disabled",
+            "enabled"
+          ],
+          "default": "disabled",
+          "description": "Enable experimental caching for active use during development"
+        }
+      }
+    }
   }
 }
