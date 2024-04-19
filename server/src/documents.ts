@@ -13,6 +13,8 @@ import { parse } from "scss-sassdoc-parser";
 import type { Connection } from "./server";
 import { logMessage } from "./log";
 import { settings } from "./settings";
+import { parse as postcssParse } from "postcss";
+import postcss = require("postcss");
 
 type DocumentAST = {
   ast: Node;
@@ -79,6 +81,8 @@ export async function scan(uri: string): Promise<void> {
   logMessage(`updating document ${textDocument.uri}`);
 
   const docs = await parse(textDocument.getText());
+  const ast2 = postcssParse(textDocument.getText());
+
   const ast = languageService.parseStylesheet(textDocument) as Node;
   const _symbols = languageService.findDocumentSymbols2(textDocument, ast);
   const symbols = _symbols.map((symbol) =>
