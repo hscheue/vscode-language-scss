@@ -1,29 +1,17 @@
-import { Node, parse } from "postcss";
-import { getDocument } from "./documents";
 import {
   CompletionItem,
   CompletionItemKind as CIK,
 } from "vscode-css-languageservice";
 import validateColor from "validate-color";
 import { basename } from "path";
-import { getLinks } from "../resolveReference";
+import { getNodeSymbols } from "./getNodeSymbols";
 
-export function getCompletions(
-  uri: string,
-  set?: Set<string>
-): CompletionItem[] {
-  const textDocument = getDocument(uri);
-  if (!textDocument) return [];
-  const root = parse(textDocument.getText());
-
+export function getCompletions(uri: string): CompletionItem[] {
   const completions: CompletionItem[] = [];
+  const symbols = getNodeSymbols(uri);
 
-  const initSet = set ? set : new Set<string>();
-  const links = getLinks(root, uri, initSet);
-
-  const linkedCompletions = links.flatMap((link) => getCompletions(link));
-
-  root.walk((node) => {
+  symbols.forEach((symbol) => {
+    const node = symbol.node;
     if (node.type === "decl" && node.variable) {
       const kind = validateColor(node.value) ? CIK.Color : CIK.Variable;
       completions.push({
@@ -48,40 +36,5 @@ export function getCompletions(
     }
   });
 
-  return [...linkedCompletions, ...completions];
-}
-
-export type ASymbol = { node: Node; label: string; uri: string };
-
-export function getSymbols(uri: string, set?: Set<string>): ASymbol[] {
-  const textDocument = getDocument(uri);
-  if (!textDocument) return [];
-  const root = parse(textDocument.getText());
-
-  const symbols: ASymbol[] = [];
-
-  const initSet = set ? set : new Set<string>();
-  const links = getLinks(root, uri, initSet);
-
-  const linkedSymbols = links.flatMap((link) => getSymbols(link));
-
-  root.walk((node) => {
-    if (node.type === "decl" && node.variable) {
-      symbols.push({
-        node,
-        label: node.prop,
-        uri,
-      });
-    }
-
-    if (node.type === "atrule" && node.name === "mixin") {
-      symbols.push({
-        node,
-        label: node.params,
-        uri,
-      });
-    }
-  });
-
-  return [...linkedSymbols, ...symbols];
+  return completions;
 }

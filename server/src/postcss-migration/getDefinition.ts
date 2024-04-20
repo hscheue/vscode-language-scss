@@ -2,8 +2,8 @@ import { Location, Range } from "vscode-css-languageservice";
 import { getDocument } from "./documents";
 import { parse } from "postcss";
 import { DefinitionParams } from "vscode-languageserver";
-import { getSymbols } from "./getCompletions";
 import { getNameAtPosition } from "./utils";
+import { getNodeSymbols } from "./getNodeSymbols";
 
 export function getDefinition(definition: DefinitionParams): Location | null {
   const doc = getDocument(definition.textDocument.uri);
@@ -11,7 +11,7 @@ export function getDefinition(definition: DefinitionParams): Location | null {
 
   const root = parse(doc.getText());
   const value = getNameAtPosition(root, definition.position);
-  const symbols = getSymbols(definition.textDocument.uri);
+  const symbols = getNodeSymbols(definition.textDocument.uri);
 
   const symbol = symbols.find((c) => c.label === value);
   if (!symbol) return null;
