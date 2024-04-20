@@ -5,8 +5,10 @@ import {
 import validateColor from "validate-color";
 import { basename } from "path";
 import { getNodeSymbols } from "./getNodeSymbols";
+import { CompletionParams } from "vscode-languageserver";
 
-export function getCompletions(uri: string): CompletionItem[] {
+export function getCompletions(completion: CompletionParams): CompletionItem[] {
+  const uri = completion.textDocument.uri;
   const completions: CompletionItem[] = [];
   const symbols = getNodeSymbols(uri);
 

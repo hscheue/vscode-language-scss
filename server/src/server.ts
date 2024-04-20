@@ -10,7 +10,6 @@ import { getHover } from "./postcss-migration/getHover";
 import { getDefinition } from "./postcss-migration/getDefinition";
 
 const connection = createConnection(ProposedFeatures.all);
-
 export type Connection = typeof connection;
 
 connection.onInitialize((params) => {
@@ -34,7 +33,7 @@ connection.onInitialized(async () => {
 });
 
 connection.onHover((h) => getHover(h));
-connection.onCompletion((c) => getCompletions(c.textDocument.uri));
+connection.onCompletion((c) => getCompletions(c));
 connection.onDefinition((d) => getDefinition(d));
 
 postcssListen(connection);
