@@ -1,5 +1,5 @@
 import { getDocument } from "./getDocument";
-import { parse } from "postcss";
+import { parse } from "postcss-scss";
 import { DefinitionParams, Location, Range } from "vscode-languageserver";
 import { getNameAtPosition } from "./getNameAtPosition";
 import { getNodeSymbols } from "./getNodeSymbols";
@@ -28,7 +28,6 @@ export function getDefinition(definition: DefinitionParams): Location | null {
     return null;
   }
 
-  // check off by one from ast to textdocument starting index
   return Location.create(
     symbol.uri,
     Range.create(startLine - 1, startColumn, endLine - 1, endColumn)
