@@ -1,4 +1,4 @@
-import { parse } from "postcss";
+import { Node, parse } from "postcss";
 import { getDocument } from "./documents";
 import {
   CompletionItem,
@@ -49,4 +49,39 @@ export function getCompletions(
   });
 
   return [...linkedCompletions, ...completions];
+}
+
+export type ASymbol = { node: Node; label: string; uri: string };
+
+export function getSymbols(uri: string, set?: Set<string>): ASymbol[] {
+  const textDocument = getDocument(uri);
+  if (!textDocument) return [];
+  const root = parse(textDocument.getText());
+
+  const symbols: ASymbol[] = [];
+
+  const initSet = set ? set : new Set<string>();
+  const links = getLinks(root, uri, initSet);
+
+  const linkedSymbols = links.flatMap((link) => getSymbols(link));
+
+  root.walk((node) => {
+    if (node.type === "decl" && node.variable) {
+      symbols.push({
+        node,
+        label: node.prop,
+        uri,
+      });
+    }
+
+    if (node.type === "atrule" && node.name === "mixin") {
+      symbols.push({
+        node,
+        label: node.params,
+        uri,
+      });
+    }
+  });
+
+  return [...linkedSymbols, ...symbols];
 }

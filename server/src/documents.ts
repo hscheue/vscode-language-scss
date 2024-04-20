@@ -11,7 +11,6 @@ import { resolveReference } from "./resolveReference";
 import { EnhancedSymbol, enhanceSymbol } from "./enhanceSymbol";
 import { parse } from "scss-sassdoc-parser";
 import type { Connection } from "./server";
-import { logMessage } from "./log";
 import { settings } from "./settings";
 
 type DocumentAST = {
@@ -49,7 +48,7 @@ function _skip(textDocument: TextDocument): boolean {
     settings.workspaceSettings?.experimental?.caching === "enabled";
   if (!enableCaching) return false;
   const state = storage.get(textDocument.uri);
-  // logMessage(`${textDocument.version} -- ${state?.version}`);
+  // (`${textDocument.version} -- ${state?.version}`);
   if (typeof state?.version !== "number") return false;
   if (state.version === textDocument.version) return false;
   /** Overwritten dist files don't increment version nor triggers onDidChange */
@@ -66,7 +65,6 @@ export function _getTextDocument(uri: string): TextDocument | undefined {
     const textDocument = TextDocument.create(uri, "scss", 1, content);
     return textDocument;
   } catch {
-    logMessage(`error on _getTextDocument: ${uri}`);
     return undefined;
   }
 }
@@ -76,7 +74,6 @@ export async function scan(uri: string): Promise<void> {
   const textDocument = _getTextDocument(uri);
   if (!textDocument) return;
   if (_skip(textDocument)) return;
-  logMessage(`updating document ${textDocument.uri}`);
 
   const docs = await parse(textDocument.getText());
 
@@ -93,7 +90,6 @@ export async function scan(uri: string): Promise<void> {
 
   for (const link of links) {
     if (link.target) {
-      logMessage(`linked to ${link.target}`);
       scan(link.target);
     }
   }

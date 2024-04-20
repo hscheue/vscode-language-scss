@@ -1,10 +1,8 @@
 import * as path from "path";
-import { ExtensionContext, window } from "vscode";
+import { ExtensionContext } from "vscode";
 import { LanguageClient, TransportKind } from "vscode-languageclient/node";
 
 let client: LanguageClient;
-
-const outputChannel = window.createOutputChannel("vscode-language-scss");
 
 export function activate(context: ExtensionContext) {
   const serverModule = context.asAbsolutePath(
@@ -22,10 +20,6 @@ export function activate(context: ExtensionContext) {
       documentSelector: [{ scheme: "file", language: "scss" }],
     }
   );
-
-  client.onNotification("logMessage", (message) => {
-    outputChannel.appendLine(message);
-  });
 
   client.start();
 }

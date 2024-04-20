@@ -3,11 +3,11 @@ import {
   ProposedFeatures,
   TextDocumentSyncKind,
 } from "vscode-languageserver/node";
-import { registerLogger } from "./log";
 import { settings } from "./settings";
 import { getCompletions } from "./postcss-migration/getCompletions";
 import { postcssListen } from "./postcss-migration/documents";
 import { getHover } from "./postcss-migration/getHover";
+import { getDefinition } from "./postcss-migration/getDefinition";
 
 const connection = createConnection(ProposedFeatures.all);
 
@@ -21,33 +21,21 @@ connection.onInitialize((params) => {
       textDocumentSync: TextDocumentSyncKind.None,
       completionProvider: { resolveProvider: false },
       hoverProvider: true,
-      // definitionProvider: true,
+      definitionProvider: true,
     },
   };
 });
 
 connection.onInitialized(async () => {
-  const workspaceSettings = await connection.workspace.getConfiguration({
+  settings.workspaceSettings = await connection.workspace.getConfiguration({
     scopeUri: settings.baseURL,
     section: "vscode-language-scss",
   });
-  settings.workspaceSettings = workspaceSettings;
 });
 
-connection.onHover(async (hover) => {
-  return getHover(hover);
-});
+connection.onHover((h) => getHover(h));
+connection.onCompletion((c) => getCompletions(c.textDocument.uri));
+connection.onDefinition((d) => getDefinition(d));
 
-connection.onCompletion((completion) =>
-  getCompletions(completion.textDocument.uri)
-);
-
-// connection.onDefinition(async (definition) => {
-//   await scan(definition.textDocument.uri);
-//   const symbols = getConcatenatedSymbols(definition.textDocument.uri);
-//   return getDefinitionFromSymbols(symbols, definition);
-// });
-
-registerLogger(connection);
 postcssListen(connection);
 connection.listen();
