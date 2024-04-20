@@ -1,7 +1,6 @@
-import { Location, Range } from "vscode-css-languageservice";
 import { getDocument } from "./getDocument";
 import { parse } from "postcss";
-import { DefinitionParams } from "vscode-languageserver";
+import { DefinitionParams, Location, Range } from "vscode-languageserver";
 import { getNameAtPosition } from "./getNameAtPosition";
 import { getNodeSymbols } from "./getNodeSymbols";
 

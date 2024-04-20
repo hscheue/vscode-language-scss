@@ -1,14 +1,10 @@
 import { existsSync } from "fs";
 import { join } from "path";
-import { DocumentContext } from "vscode-css-languageservice";
 
 import { settings } from "./settings";
 import { Root } from "postcss";
 
-export const resolveReference: DocumentContext["resolveReference"] = (
-  ref,
-  baseUrl
-) => {
+export function resolveReference(ref: string, baseUrl: string) {
   if (ref.startsWith("https://") || ref.startsWith("http://")) {
     console.log(`ref: ${ref}; baseUrl: ${baseUrl};`);
     return undefined;
@@ -42,7 +38,7 @@ export const resolveReference: DocumentContext["resolveReference"] = (
     if (m2) return m2;
   }
   return undefined;
-};
+}
 
 function resolveFor(url: string): string | undefined {
   return existsSync(url.replace("file://", "")) ? url : undefined;

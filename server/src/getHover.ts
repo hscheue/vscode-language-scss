@@ -1,7 +1,6 @@
-import { Hover, MarkupKind } from "vscode-css-languageservice";
 import { getDocument } from "./getDocument";
 import { parse } from "postcss";
-import { HoverParams } from "vscode-languageserver";
+import { Hover, HoverParams, MarkupKind } from "vscode-languageserver";
 import { getNameAtPosition } from "./getNameAtPosition";
 import { getNodeSymbols } from "./getNodeSymbols";
 

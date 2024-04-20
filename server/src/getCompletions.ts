@@ -1,11 +1,11 @@
-import {
-  CompletionItem,
-  CompletionItemKind as CIK,
-} from "vscode-css-languageservice";
 import validateColor from "validate-color";
 import { basename } from "path";
 import { getNodeSymbols } from "./getNodeSymbols";
-import { CompletionParams } from "vscode-languageserver";
+import {
+  CompletionItem,
+  CompletionItemKind as CIK,
+  CompletionParams,
+} from "vscode-languageserver";
 
 export function getCompletions(completion: CompletionParams): CompletionItem[] {
   const uri = completion.textDocument.uri;
