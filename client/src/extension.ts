@@ -5,15 +5,11 @@ import { LanguageClient, TransportKind } from "vscode-languageclient/node";
 let client: LanguageClient;
 
 export function activate(context: ExtensionContext) {
-  const serverModule = context.asAbsolutePath(
-    path.join("server", "out", "server.js")
-  );
-
   client = new LanguageClient(
-    "languageServerExample",
-    "Language Server Example",
+    "vscode-language-server",
+    "vscode-language-server",
     {
-      module: serverModule,
+      module: context.asAbsolutePath(path.join("server", "out", "server.js")),
       transport: TransportKind.ipc,
     },
     {
@@ -25,8 +21,6 @@ export function activate(context: ExtensionContext) {
 }
 
 export function deactivate(): Thenable<void> | undefined {
-  if (!client) {
-    return undefined;
-  }
+  if (!client) return undefined;
   return client.stop();
 }
