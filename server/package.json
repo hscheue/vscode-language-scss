@@ -7,6 +7,8 @@
     "vscode-languageserver-textdocument": "^1.0.11",
     "vscode-uri": "^3.0.8",
     "validate-color": "^2.2.4",
-    "postcss": "8.4.38"
+    "postcss": "8.4.38",
+    "postcss-scss": "4.0.9",
+    "scss-sassdoc-parser": "2.0.0"
   }
 }

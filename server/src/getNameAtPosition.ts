@@ -1,4 +1,4 @@
-import { Root } from "postcss";
+import type { Root } from "postcss";
 import { Position } from "vscode-languageserver-textdocument";
 
 export function getNameAtPosition(root: Root, position: Position): string {

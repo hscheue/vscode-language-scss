@@ -1,13 +1,19 @@
-import { ChildNode, parse } from "postcss";
+import { parse } from "postcss-scss";
+import type { ChildNode } from "postcss";
 import { getDocument } from "./getDocument";
 import { getLinks } from "./resolveReference";
 
-export type NodeSymbol = { node: ChildNode; label: string; uri: string };
+export type NodeSymbol = {
+  node: ChildNode;
+  label: string;
+  uri: string;
+};
 
 export function getNodeSymbols(uri: string, set?: Set<string>): NodeSymbol[] {
   const textDocument = getDocument(uri);
   if (!textDocument) return [];
-  const root = parse(textDocument.getText());
+  const text = textDocument.getText();
+  const root = parse(text);
 
   const symbols: NodeSymbol[] = [];
 

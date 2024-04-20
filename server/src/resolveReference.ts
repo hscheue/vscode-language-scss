@@ -2,7 +2,7 @@ import { existsSync } from "fs";
 import { join } from "path";
 
 import { settings } from "./settings";
-import { Root } from "postcss";
+import type { Root } from "postcss";
 
 export function resolveReference(ref: string, baseUrl: string) {
   if (ref.startsWith("https://") || ref.startsWith("http://")) {
