@@ -3,12 +3,11 @@ import {
   ProposedFeatures,
   TextDocumentSyncKind,
 } from "vscode-languageserver/node";
-import { getConcatenatedSymbols, listen, scan } from "./documents";
-import { getCompletionsFromSymbols } from "./completions";
-import { getHoverFromSymbols } from "./hover";
 import { registerLogger } from "./log";
-import { getDefinitionFromSymbols } from "./definition";
 import { settings } from "./settings";
+import { getCompletions } from "./postcss-migration/getCompletions";
+import { postcssListen } from "./postcss-migration/documents";
+import { getHover } from "./postcss-migration/getHover";
 
 const connection = createConnection(ProposedFeatures.all);
 
@@ -19,10 +18,10 @@ connection.onInitialize((params) => {
 
   return {
     capabilities: {
-      textDocumentSync: TextDocumentSyncKind.Incremental,
+      textDocumentSync: TextDocumentSyncKind.None,
       completionProvider: { resolveProvider: false },
       hoverProvider: true,
-      definitionProvider: true,
+      // definitionProvider: true,
     },
   };
 });
@@ -36,23 +35,19 @@ connection.onInitialized(async () => {
 });
 
 connection.onHover(async (hover) => {
-  await scan(hover.textDocument.uri);
-  const symbols = getConcatenatedSymbols(hover.textDocument.uri);
-  return getHoverFromSymbols(symbols, hover);
+  return getHover(hover);
 });
 
-connection.onCompletion(async (completion) => {
-  await scan(completion.textDocument.uri);
-  const symbols = getConcatenatedSymbols(completion.textDocument.uri);
-  return getCompletionsFromSymbols(symbols);
-});
+connection.onCompletion((completion) =>
+  getCompletions(completion.textDocument.uri)
+);
 
-connection.onDefinition(async (definition) => {
-  await scan(definition.textDocument.uri);
-  const symbols = getConcatenatedSymbols(definition.textDocument.uri);
-  return getDefinitionFromSymbols(symbols, definition);
-});
+// connection.onDefinition(async (definition) => {
+//   await scan(definition.textDocument.uri);
+//   const symbols = getConcatenatedSymbols(definition.textDocument.uri);
+//   return getDefinitionFromSymbols(symbols, definition);
+// });
 
-listen(connection);
 registerLogger(connection);
+postcssListen(connection);
 connection.listen();

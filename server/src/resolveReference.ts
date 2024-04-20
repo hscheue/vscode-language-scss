@@ -3,6 +3,7 @@ import { join } from "path";
 import { DocumentContext } from "vscode-css-languageservice";
 import { logMessage } from "./log";
 import { settings } from "./settings";
+import { Root } from "postcss";
 
 export const resolveReference: DocumentContext["resolveReference"] = (
   ref,
@@ -68,4 +69,22 @@ function getString(ref: string, baseUrl: string, slash: boolean, dist?: true) {
   }
   ref = parts.join("/");
   return new URL(`${ref}.scss`, baseUrl).toString();
+}
+
+export function getLinks(root: Root, baseURL: string, set: Set<string>) {
+  const linkURI: string[] = [];
+
+  root.walk((node) => {
+    if (node.type === "atrule" && node.name === "use") {
+      /** FIXME */
+      const path = node.params.split('"')[1];
+      const link = resolveReference(path, baseURL);
+      if (link && !set.has(link)) {
+        set.add(link);
+        linkURI.push(link);
+      }
+    }
+  });
+
+  return linkURI;
 }
