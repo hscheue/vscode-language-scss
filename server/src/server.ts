@@ -4,10 +4,10 @@ import {
   TextDocumentSyncKind,
 } from "vscode-languageserver/node";
 import { settings } from "./settings";
-import { getCompletions } from "./postcss-migration/getCompletions";
-import { postcssListen } from "./postcss-migration/documents";
-import { getHover } from "./postcss-migration/getHover";
-import { getDefinition } from "./postcss-migration/getDefinition";
+import { getCompletions } from "./getCompletions";
+import { postcssListen } from "./getDocument";
+import { getHover } from "./getHover";
+import { getDefinition } from "./getDefinition";
 
 const connection = createConnection(ProposedFeatures.all);
 export type Connection = typeof connection;

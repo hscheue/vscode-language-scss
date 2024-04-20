@@ -1,6 +1,6 @@
 import { ChildNode, parse } from "postcss";
-import { getDocument } from "./documents";
-import { getLinks } from "../resolveReference";
+import { getDocument } from "./getDocument";
+import { getLinks } from "./resolveReference";
 
 export type NodeSymbol = { node: ChildNode; label: string; uri: string };
 

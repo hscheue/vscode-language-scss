@@ -1,8 +1,8 @@
 import { Hover, MarkupKind } from "vscode-css-languageservice";
-import { getDocument } from "./documents";
+import { getDocument } from "./getDocument";
 import { parse } from "postcss";
 import { HoverParams } from "vscode-languageserver";
-import { getNameAtPosition } from "./utils";
+import { getNameAtPosition } from "./getNameAtPosition";
 import { getNodeSymbols } from "./getNodeSymbols";
 
 export function getHover(hover: HoverParams): Hover | null {
