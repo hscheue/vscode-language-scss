@@ -3,15 +3,13 @@ import {
   ProposedFeatures,
   TextDocumentSyncKind,
 } from "vscode-languageserver/node";
-import { getConcatenatedSymbols, listen, scan } from "./documents";
-import { getCompletionsFromSymbols } from "./completions";
-import { getHoverFromSymbols } from "./hover";
-import { registerLogger } from "./log";
-import { getDefinitionFromSymbols } from "./definition";
 import { settings } from "./settings";
+import { getCompletions } from "./getCompletions";
+import { postcssListen } from "./getDocument";
+import { getHover } from "./getHover";
+import { getDefinition } from "./getDefinition";
 
 const connection = createConnection(ProposedFeatures.all);
-
 export type Connection = typeof connection;
 
 connection.onInitialize((params) => {
@@ -19,7 +17,7 @@ connection.onInitialize((params) => {
 
   return {
     capabilities: {
-      textDocumentSync: TextDocumentSyncKind.Incremental,
+      textDocumentSync: TextDocumentSyncKind.None,
       completionProvider: { resolveProvider: false },
       hoverProvider: true,
       definitionProvider: true,
@@ -28,31 +26,15 @@ connection.onInitialize((params) => {
 });
 
 connection.onInitialized(async () => {
-  const workspaceSettings = await connection.workspace.getConfiguration({
+  settings.workspaceSettings = await connection.workspace.getConfiguration({
     scopeUri: settings.baseURL,
     section: "vscode-language-scss",
   });
-  settings.workspaceSettings = workspaceSettings;
 });
 
-connection.onHover(async (hover) => {
-  await scan(hover.textDocument.uri);
-  const symbols = getConcatenatedSymbols(hover.textDocument.uri);
-  return getHoverFromSymbols(symbols, hover);
-});
+connection.onHover((h) => getHover(h));
+connection.onCompletion((c) => getCompletions(c));
+connection.onDefinition((d) => getDefinition(d));
 
-connection.onCompletion(async (completion) => {
-  await scan(completion.textDocument.uri);
-  const symbols = getConcatenatedSymbols(completion.textDocument.uri);
-  return getCompletionsFromSymbols(symbols);
-});
-
-connection.onDefinition(async (definition) => {
-  await scan(definition.textDocument.uri);
-  const symbols = getConcatenatedSymbols(definition.textDocument.uri);
-  return getDefinitionFromSymbols(symbols, definition);
-});
-
-listen(connection);
-registerLogger(connection);
+postcssListen(connection);
 connection.listen();

@@ -1,58 +1,44 @@
 import { existsSync } from "fs";
 import { join } from "path";
-import { DocumentContext } from "vscode-css-languageservice";
-import { logMessage } from "./log";
-import { settings } from "./settings";
 
-export const resolveReference: DocumentContext["resolveReference"] = (
-  ref,
-  baseUrl
-) => {
+import { settings } from "./settings";
+import { Root } from "postcss";
+
+export function resolveReference(ref: string, baseUrl: string) {
   if (ref.startsWith("https://") || ref.startsWith("http://")) {
-    logMessage(`ref: ${ref}; baseUrl: ${baseUrl};`);
+    console.log(`ref: ${ref}; baseUrl: ${baseUrl};`);
     return undefined;
   }
   const r1 = resolveFor(getString(ref, baseUrl, true));
-  // if (r1) logMessage(`resolved r1 ${r1}`);
   if (r1) return r1;
   const r2 = resolveFor(getString(ref, baseUrl, false));
-  // if (r2) logMessage(`resolved r2 ${r2}`);
   if (r2) return r2;
 
   // poor solution to get resolveSettings.baseURL working
   const b1 = resolveFor(getString(ref, settings.baseURL + "/t", true));
-  // if (b1) logMessage(`resolved b1 ${b1}`);
   if (b1) return b1;
   const b2 = resolveFor(getString(ref, settings.baseURL + "/t", false));
-  // if (b2) logMessage(`resolved b2 ${b2}`);
   if (b2) return b2;
 
   // poor solution to get mono-repo absolute paths working
   const baseUrlPackages = baseUrl.match(/(.*\/packages\/[^/]+\/)/)?.[0];
   if (baseUrlPackages) {
-    // logMessage(`baseUrlPackages ${baseUrlPackages}`);
     const a1 = resolveFor(getString(ref, baseUrlPackages, true));
-    // if (a1) logMessage(`resolved a1 ${a1}`);
     if (a1) return a1;
     const a2 = resolveFor(getString(ref, baseUrlPackages, false));
-    // if (a2) logMessage(`resolved a2 ${a2}`);
     if (a2) return a2;
   }
 
   // poor solution to get node_modules paths working
   const baseUrlModules = join(settings.baseURL, "node_modules", "src");
   if (baseUrlModules) {
-    // logMessage(`baseUrlModules ${baseUrlModules}`);
     const m1 = resolveFor(getString(ref, baseUrlModules, true, true));
-    // if (m1) logMessage(`resolved m1 ${m1}`);
     if (m1) return m1;
     const m2 = resolveFor(getString(ref, baseUrlModules, false, true));
-    // if (m2) logMessage(`resolved m2 ${m2}`);
     if (m2) return m2;
   }
-  // logMessage(`resolve missed`);
   return undefined;
-};
+}
 
 function resolveFor(url: string): string | undefined {
   return existsSync(url.replace("file://", "")) ? url : undefined;
@@ -68,4 +54,22 @@ function getString(ref: string, baseUrl: string, slash: boolean, dist?: true) {
   }
   ref = parts.join("/");
   return new URL(`${ref}.scss`, baseUrl).toString();
+}
+
+export function getLinks(root: Root, baseURL: string, set: Set<string>) {
+  const linkURI: string[] = [];
+
+  root.walk((node) => {
+    if (node.type === "atrule" && node.name === "use") {
+      /** FIXME */
+      const path = node.params.split('"')[1];
+      const link = resolveReference(path, baseURL);
+      if (link && !set.has(link)) {
+        set.add(link);
+        linkURI.push(link);
+      }
+    }
+  });
+
+  return linkURI;
 }
