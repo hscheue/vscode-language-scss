@@ -2,7 +2,7 @@ import { readFileSync } from "fs";
 import { TextDocuments } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
-import { Connection } from "./server";
+import { Connection } from "../server";
 
 const textDocuments: TextDocuments<TextDocument> = new TextDocuments(
   TextDocument

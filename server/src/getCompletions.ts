@@ -1,6 +1,6 @@
 import validateColor from "validate-color";
 import { basename } from "path";
-import { getNodeSymbols } from "./getNodeSymbols";
+import { getNodeSymbols } from "./_shared/getNodeSymbols";
 import {
   CompletionItem,
   CompletionItemKind as CIK,

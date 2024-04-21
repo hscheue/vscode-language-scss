@@ -1,8 +1,8 @@
-import { getDocument } from "./getDocument";
+import { getDocument } from "./_shared/getDocument";
 import { parse } from "postcss-scss";
 import { Hover, HoverParams, MarkupKind } from "vscode-languageserver";
-import { getNameAtPosition } from "./getNameAtPosition";
-import { getNodeSymbolsDocs } from "./getNodeSymbolsDocs";
+import { getNameAtPosition } from "./_shared/getNameAtPosition";
+import { getNodeSymbolsDocs } from "./_shared/getNodeSymbolsDocs";
 
 export async function getHover(hover: HoverParams): Promise<Hover | null> {
   const doc = getDocument(hover.textDocument.uri);

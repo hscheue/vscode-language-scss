@@ -3,9 +3,9 @@ import {
   ProposedFeatures,
   TextDocumentSyncKind,
 } from "vscode-languageserver/node";
-import { settings } from "./settings";
+import { settings } from "./_shared/settings";
 import { getCompletions } from "./getCompletions";
-import { postcssListen } from "./getDocument";
+import { postcssListen } from "./_shared/getDocument";
 import { getHover } from "./getHover";
 import { getDefinition } from "./getDefinition";
 
