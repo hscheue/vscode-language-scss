@@ -17,7 +17,12 @@ export async function getHover(hover: HoverParams): Promise<Hover | null> {
 
   return {
     contents: {
-      value: ["```scss", `${symbol.label}`, "```", `${symbol.doc?.description}`]
+      value: [
+        "```scss",
+        `${symbol.label}`,
+        "```",
+        `${symbol.doc?.description ?? ""}`,
+      ]
         .filter(Boolean)
         .join("\n"),
       kind: MarkupKind.Markdown,
