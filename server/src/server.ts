@@ -17,7 +17,7 @@ connection.onInitialize((params) => {
 
   return {
     capabilities: {
-      textDocumentSync: TextDocumentSyncKind.None,
+      textDocumentSync: TextDocumentSyncKind.Incremental,
       completionProvider: { resolveProvider: false },
       hoverProvider: true,
       definitionProvider: true,

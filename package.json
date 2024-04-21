@@ -35,15 +35,11 @@
       "title": "vscode-language-scss",
       "type": "object",
       "properties": {
-        "vscode-language-scss.experimental.caching": {
+        "vscode-language-scss.experimental.themeDiagnosticsFile": {
           "scope": "resource",
           "type": "string",
-          "enum": [
-            "disabled",
-            "enabled"
-          ],
-          "default": "disabled",
-          "description": "Enable experimental caching for active use during development"
+          "default": "",
+          "description": "Enable experimental theme diagnostic highlighting"
         }
       }
     }
