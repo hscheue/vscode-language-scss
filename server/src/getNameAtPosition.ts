@@ -16,6 +16,9 @@ export function getNameAtPosition(root: Root, position: Position): string {
       if (node.type === "decl") {
         value = node.value;
       }
+      if (node.type === "atrule" && node.name === "include") {
+        value = node.params;
+      }
     }
   });
 
