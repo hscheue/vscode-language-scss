@@ -60,7 +60,10 @@ export function getLinks(root: Root, baseURL: string, set: Set<string>) {
   const linkURI: string[] = [];
 
   root.walk((node) => {
-    if (node.type === "atrule" && node.name === "use") {
+    if (
+      node.type === "atrule" &&
+      (node.name === "use" || node.name === "import")
+    ) {
       /** FIXME */
       const path = node.params.split('"')[1];
       const path2 = node.params.split("'")[1];
