@@ -63,7 +63,10 @@ export function getLinks(root: Root, baseURL: string, set: Set<string>) {
     if (node.type === "atrule" && node.name === "use") {
       /** FIXME */
       const path = node.params.split('"')[1];
-      const link = resolveReference(path, baseURL);
+      const path2 = node.params.split("'")[1];
+      const p = path ?? path2;
+      if (!p) return;
+      const link = resolveReference(p, baseURL);
       if (link && !set.has(link)) {
         set.add(link);
         linkURI.push(link);
