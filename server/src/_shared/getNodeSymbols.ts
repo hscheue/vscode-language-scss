@@ -9,7 +9,19 @@ export type NodeSymbol = {
   uri: string;
 };
 
-export function getNodeSymbols(uri: string, set?: Set<string>): NodeSymbol[] {
+const store = new Map<string, NodeSymbol[]>();
+
+export function getNodeSymbols(uri: string): NodeSymbol[] {
+  try {
+    const symbols = _getNodeSymbolsRec(uri, new Set<string>());
+    store.set(uri, symbols);
+    return symbols;
+  } catch (err) {
+    return store.get(uri) ?? [];
+  }
+}
+
+function _getNodeSymbolsRec(uri: string, set: Set<string>): NodeSymbol[] {
   const textDocument = getDocument(uri);
   if (!textDocument) return [];
   const text = textDocument.getText();
