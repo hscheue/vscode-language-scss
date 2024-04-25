@@ -17,7 +17,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
       - run: |
+          FILE=$(ls -xm VSIX/vscode-language-scss-*.vsix)
           TAG="${GITHUB_REF##*/}"
-          gh release upload "${TAG}" VSIX/vscode-language-scss-0.0.1.vsix
+          gh release upload "${TAG}" ${FILE}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

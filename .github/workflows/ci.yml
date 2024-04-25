@@ -16,5 +16,5 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: VSIX
-          path: vscode-language-scss-0.0.1.vsix
+          path: vscode-language-scss-*.vsix
           retention-days: 30
