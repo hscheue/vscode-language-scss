@@ -10,14 +10,21 @@ export type NodeSymbol = {
 };
 
 const store = new Map<string, NodeSymbol[]>();
+const filesStore = new Map<string, string[]>();
 
-export function getNodeSymbols(uri: string): NodeSymbol[] {
+export function getNodeSymbols(uri: string): {
+  symbols: NodeSymbol[];
+  files: string[];
+} {
   try {
-    const symbols = _getNodeSymbolsRec(uri, new Set<string>());
+    const set = new Set<string>();
+    const symbols = _getNodeSymbolsRec(uri, set);
     store.set(uri, symbols);
-    return symbols;
+    const files = Array.from(set);
+    filesStore.set(uri, files);
+    return { symbols, files };
   } catch (err) {
-    return store.get(uri) ?? [];
+    return { symbols: store.get(uri) ?? [], files: filesStore.get(uri) ?? [] };
   }
 }
 
@@ -29,10 +36,9 @@ function _getNodeSymbolsRec(uri: string, set: Set<string>): NodeSymbol[] {
 
   const symbols: NodeSymbol[] = [];
 
-  const initSet = set ? set : new Set<string>();
-  const links = getLinks(root, uri, initSet);
+  const links = getLinks(root, uri, set);
 
-  const linkedSymbols = links.flatMap((link) => getNodeSymbols(link));
+  const linkedSymbols = links.flatMap((link) => _getNodeSymbolsRec(link, set));
 
   root.walk((node) => {
     if (node.type === "decl" && node.variable) {

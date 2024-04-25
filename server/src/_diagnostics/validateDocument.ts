@@ -37,7 +37,9 @@ export async function validateDocument(uri: string): Promise<Diagnostic[]> {
   const themeSetting = await asyncThemeDiagnosticsFile(connection);
   if (!themeSetting) return [];
   const diagnostics: Diagnostic[] = [];
-  const theme = getThemeValues(resolveReference(themeSetting, uri));
-  _addDiagnostic(uri, theme, diagnostics);
+  const { record, files } = getThemeValues(resolveReference(themeSetting, uri));
+  if (!files.includes(uri)) {
+    _addDiagnostic(uri, record, diagnostics);
+  }
   return diagnostics;
 }
