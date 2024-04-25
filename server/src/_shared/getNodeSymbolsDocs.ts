@@ -37,12 +37,11 @@ async function _getNodeSymbolsDocsRec(
 
   const symbols: NodeSymbolDoc[] = [];
 
-  const initSet = set ? set : new Set<string>();
-  const links = getLinks(root, uri, initSet);
+  const links = getLinks(root, uri, set);
 
   const linkedSymbols = await Promise.all(
     links.flatMap(async (link) => {
-      const values = await getNodeSymbolsDocs(link);
+      const values = await _getNodeSymbolsDocsRec(link, set);
       return values;
     })
   );
