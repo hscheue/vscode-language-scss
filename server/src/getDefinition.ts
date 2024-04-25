@@ -11,7 +11,7 @@ export function getDefinition(definition: DefinitionParams): Location | null {
 
   const root = parse(doc.getText());
   const value = getNameAtPosition(root, definition.position);
-  const symbols = getNodeSymbols(definition.textDocument.uri);
+  const { symbols } = getNodeSymbols(definition.textDocument.uri);
 
   const symbol = symbols.find((c) => c.label === value);
   if (!symbol) return null;

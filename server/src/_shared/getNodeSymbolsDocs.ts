@@ -11,9 +11,23 @@ export type NodeSymbolDoc = {
   uri: string;
 };
 
+const store = new Map<string, NodeSymbolDoc[]>();
+
 export async function getNodeSymbolsDocs(
+  uri: string
+): Promise<NodeSymbolDoc[]> {
+  try {
+    const symbols = await _getNodeSymbolsDocsRec(uri, new Set<string>());
+    store.set(uri, symbols);
+    return symbols;
+  } catch (err) {
+    return store.get(uri) ?? [];
+  }
+}
+
+async function _getNodeSymbolsDocsRec(
   uri: string,
-  set?: Set<string>
+  set: Set<string>
 ): Promise<NodeSymbolDoc[]> {
   const textDocument = getDocument(uri);
   if (!textDocument) return [];
@@ -23,12 +37,11 @@ export async function getNodeSymbolsDocs(
 
   const symbols: NodeSymbolDoc[] = [];
 
-  const initSet = set ? set : new Set<string>();
-  const links = getLinks(root, uri, initSet);
+  const links = getLinks(root, uri, set);
 
   const linkedSymbols = await Promise.all(
     links.flatMap(async (link) => {
-      const values = await getNodeSymbolsDocs(link);
+      const values = await _getNodeSymbolsDocsRec(link, set);
       return values;
     })
   );

@@ -16,5 +16,10 @@ export function getRangeFromNode(node: ChildNode): Range | null {
     return null;
   }
 
-  return Range.create(startLine - 1, startColumn, endLine - 1, endColumn);
+  return Range.create(
+    startLine - 1,
+    startColumn - 1,
+    endLine - 1,
+    endColumn - 1
+  );
 }

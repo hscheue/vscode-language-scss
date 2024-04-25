@@ -10,7 +10,7 @@ import {
 export function getCompletions(completion: CompletionParams): CompletionItem[] {
   const uri = completion.textDocument.uri;
   const completions: CompletionItem[] = [];
-  const symbols = getNodeSymbols(uri);
+  const { symbols } = getNodeSymbols(uri);
 
   symbols.forEach((symbol) => {
     const node = symbol.node;
