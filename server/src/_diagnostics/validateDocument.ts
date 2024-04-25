@@ -1,10 +1,11 @@
 import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
-import { Connection } from "../server";
 import { getThemeValues } from "./getThemeValues";
 import { resolveReference } from "../_shared/resolveReference";
 import { getDocument } from "../_shared/getDocument";
 import { parse } from "postcss-scss";
 import { getRangeFromNode } from "../_shared/getRangeFromNode";
+import { asyncThemeDiagnosticsFile } from "../_shared/settings";
+import { connection } from "../_shared/connection";
 
 function _addDiagnostic(
   uri: string,
@@ -32,13 +33,11 @@ function _addDiagnostic(
   return diagnostics;
 }
 
-export function validateDocument(
-  c: Connection,
-  uri: string,
-  themeSetting: string
-): void {
+export async function validateDocument(uri: string): Promise<Diagnostic[]> {
+  const themeSetting = await asyncThemeDiagnosticsFile(connection);
+  if (!themeSetting) return [];
   const diagnostics: Diagnostic[] = [];
   const theme = getThemeValues(resolveReference(themeSetting, uri));
   _addDiagnostic(uri, theme, diagnostics);
-  c.sendDiagnostics({ uri, diagnostics });
+  return diagnostics;
 }

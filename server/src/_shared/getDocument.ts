@@ -28,12 +28,10 @@ export function getDocument(uri: string): TextDocument | undefined {
 export function postcssListen(connection: Connection) {
   textDocuments.listen(connection);
 
-  const themeSetting =
-    settings.workspaceSettings?.experimental?.themeDiagnosticsFile;
-
-  if (themeSetting) {
-    textDocuments.onDidChangeContent((e) => {
-      validateDocument(connection, e.document.uri, themeSetting);
+  textDocuments.onDidChangeContent(async (e) => {
+    connection.sendDiagnostics({
+      uri: e.document.uri,
+      diagnostics: await validateDocument(e.document.uri),
     });
-  }
+  });
 }
