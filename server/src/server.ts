@@ -1,5 +1,4 @@
 import {
-  DocumentDiagnosticReport,
   DocumentDiagnosticReportKind,
   TextDocumentSyncKind,
 } from "vscode-languageserver/node";
