@@ -16,13 +16,9 @@ const store = new Map<string, NodeSymbolDoc[]>();
 export async function getNodeSymbolsDocs(
   uri: string
 ): Promise<NodeSymbolDoc[]> {
-  try {
-    const symbols = await _getNodeSymbolsDocsRec(uri, new Set<string>());
-    store.set(uri, symbols);
-    return symbols;
-  } catch (err) {
-    return store.get(uri) ?? [];
-  }
+  const symbols = await _getNodeSymbolsDocsRec(uri, new Set<string>());
+  store.set(uri, symbols);
+  return symbols;
 }
 
 async function _getNodeSymbolsDocsRec(

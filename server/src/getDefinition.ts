@@ -1,9 +1,9 @@
 import { getDocument } from "./_shared/getDocument";
-import { parse } from "postcss-scss";
 import { DefinitionParams, Location } from "vscode-languageserver";
 import { getNameAtPosition } from "./_shared/getNameAtPosition";
 import { getNodeSymbols } from "./_shared/getNodeSymbols";
 import { getRangeFromNode } from "./_shared/getRangeFromNode";
+import { parse } from "../lib/scss-syntax";
 
 export function getDefinition(definition: DefinitionParams): Location | null {
   const doc = getDocument(definition.textDocument.uri);

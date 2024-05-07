@@ -14,27 +14,23 @@ function _addDiagnostic(
 ) {
   const doc = getDocument(uri);
   if (!doc) return;
-  try {
-    const root = parse(doc.getText());
+  const root = parse(doc.getText());
 
-    root.walk((node) => {
-      if (node.type === "decl" && theme[node.value]) {
-        const range = getRangeFromNode(node);
-        if (!range) return;
-        const prop = theme[node.value];
-        diagnostics.push({
-          severity: DiagnosticSeverity.Error,
-          message: `${prop} exists in theme file`,
-          source: "vscode-language-scss",
-          range,
-        });
-      }
-    });
+  root.walk((node) => {
+    if (node.type === "decl" && theme[node.value]) {
+      const range = getRangeFromNode(node);
+      if (!range) return;
+      const prop = theme[node.value];
+      diagnostics.push({
+        severity: DiagnosticSeverity.Error,
+        message: `${prop} exists in theme file`,
+        source: "vscode-language-scss",
+        range,
+      });
+    }
+  });
 
-    return diagnostics;
-  } catch (err) {
-    return [];
-  }
+  return diagnostics;
 }
 
 export async function validateDocument(uri: string): Promise<Diagnostic[]> {
