@@ -17,7 +17,7 @@ export function activate(context: ExtensionContext) {
       transport: TransportKind.ipc,
     },
     {
-      documentSelector: [{ scheme: "file", language: "scss" }],
+      documentSelector: [{ scheme: "file", language: "plaintext" }],
     }
   );
 
