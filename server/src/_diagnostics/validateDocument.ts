@@ -3,7 +3,7 @@ import { getThemeValues } from "./getThemeValues";
 import { resolveReference } from "../_shared/resolveReference";
 import { getDocument } from "../_shared/getDocument";
 import { parse } from "postcss-scss";
-import { getRangeFromNode } from "../_shared/getRangeFromNode";
+import { convertRange } from "../_shared/getRangeFromNode";
 import { asyncThemeDiagnosticsFile } from "../_shared/settings";
 import { connection } from "../_shared/connection";
 
@@ -19,13 +19,14 @@ function _addDiagnostic(
 
     root.walk((node) => {
       if (node.type === "decl" && theme[node.value]) {
-        const range = getRangeFromNode(node);
+        const range = convertRange(node.rangeBy({ word: node.value }));
         if (!range) return;
         const prop = theme[node.value];
         diagnostics.push({
           severity: DiagnosticSeverity.Error,
           message: `${prop} exists in theme file`,
           source: "vscode-language-scss",
+          data: { value: prop },
           range,
         });
       }
