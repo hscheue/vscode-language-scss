@@ -4,7 +4,6 @@ import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
 import { Connection } from "../server";
 import { validateDocument } from "../_diagnostics/validateDocument";
-import { settings } from "./settings";
 
 const textDocuments: TextDocuments<TextDocument> = new TextDocuments(
   TextDocument
