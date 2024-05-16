@@ -13,18 +13,19 @@ export function getCodeActions(codeAction: CodeActionParams): CodeAction[] {
   if (!doc) return [];
 
   let range: Range | undefined;
+  let value: string | undefined;
 
   if (
     "diagnostics" in codeAction.context &&
     codeAction.context.diagnostics.length
   ) {
     range = codeAction.context.diagnostics[0]?.range;
+    value = codeAction.context.diagnostics[0]?.data?.value;
   }
 
-  if (!range) return [];
+  if (!range || !value || typeof value !== "string") return [];
 
   const title = "Replace with theme value";
-  const value: string = codeAction.context.diagnostics[0].data.value;
 
   return [
     CodeAction.create(
