@@ -4,7 +4,7 @@ type Settings = {
   baseURL: string;
   workspaceSettings?: {
     experimental: {
-      themeDiagnosticsFile?: string;
+      themeDiagnosticsFile?: string | string[];
     };
   };
 };

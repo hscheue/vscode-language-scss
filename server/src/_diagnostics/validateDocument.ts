@@ -42,6 +42,22 @@ export async function validateDocument(uri: string): Promise<Diagnostic[]> {
   const themeSetting = await asyncThemeDiagnosticsFile(connection);
   if (!themeSetting) return [];
   const diagnostics: Diagnostic[] = [];
+
+  if (Array.isArray(themeSetting)) {
+    for (const theme of themeSetting) {
+      const themeUri = resolveReference(theme, uri);
+      if (!themeUri) continue;
+
+      const { record, files } = getThemeValues(themeUri);
+      if (!files.includes(uri) && themeUri !== uri) {
+        _addDiagnostic(uri, record, diagnostics);
+      }
+      return diagnostics;
+    }
+
+    return [];
+  }
+
   const themeUri = resolveReference(themeSetting, uri);
   const { record, files } = getThemeValues(themeUri);
   if (!files.includes(uri) && themeUri !== uri) {

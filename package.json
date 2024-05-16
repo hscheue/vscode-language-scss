@@ -37,7 +37,10 @@
       "properties": {
         "vscode-language-scss.experimental.themeDiagnosticsFile": {
           "scope": "resource",
-          "type": "string",
+          "type": [
+            "string",
+            "array"
+          ],
           "default": "",
           "description": "Enable experimental theme diagnostic highlighting"
         }
