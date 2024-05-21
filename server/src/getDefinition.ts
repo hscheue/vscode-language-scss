@@ -3,7 +3,7 @@ import { parse } from "postcss-scss";
 import { DefinitionParams, Location } from "vscode-languageserver";
 import { getNameAtPosition } from "./_shared/getNameAtPosition";
 import { getNodeSymbols } from "./_shared/getNodeSymbols";
-import { getRangeFromNode } from "./_shared/getRangeFromNode";
+import { convertRange } from "./_shared/getRangeFromNode";
 
 export function getDefinition(definition: DefinitionParams): Location | null {
   const doc = getDocument(definition.textDocument.uri);
@@ -16,7 +16,7 @@ export function getDefinition(definition: DefinitionParams): Location | null {
   const symbol = symbols.find((c) => c.label === value);
   if (!symbol) return null;
 
-  const range = getRangeFromNode(symbol.node);
+  const range = convertRange(symbol.node.rangeBy({ word: value }));
   if (!range) return null;
 
   return Location.create(symbol.uri, range);
