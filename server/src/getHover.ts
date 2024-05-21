@@ -2,7 +2,7 @@ import { getDocument } from "./_shared/getDocument";
 import { parse } from "postcss-scss";
 import { Hover, HoverParams, MarkupKind } from "vscode-languageserver";
 import { getNameAtPosition } from "./_shared/getNameAtPosition";
-import { getNodeSymbolsDocs } from "./_shared/getNodeSymbolsDocs";
+import { getNodeSymbols } from "./_shared/getNodeSymbols";
 
 export async function getHover(hover: HoverParams): Promise<Hover | null> {
   const doc = getDocument(hover.textDocument.uri);
@@ -10,21 +10,14 @@ export async function getHover(hover: HoverParams): Promise<Hover | null> {
 
   const root = parse(doc.getText());
   const value = getNameAtPosition(root, hover.position);
-  const symbols = await getNodeSymbolsDocs(hover.textDocument.uri);
+  const ast = await getNodeSymbols(hover.textDocument.uri);
 
-  const symbol = symbols.find((c) => c.label === value);
+  const symbol = ast.symbols.find((c) => c.label === value);
   if (!symbol) return null;
 
   return {
     contents: {
-      value: [
-        "```scss",
-        `${symbol.label}`,
-        "```",
-        `${symbol.doc?.description ?? ""}`,
-      ]
-        .filter(Boolean)
-        .join("\n"),
+      value: ["```scss", `${symbol.label}`, "```"].filter(Boolean).join("\n"),
       kind: MarkupKind.Markdown,
     },
   };
