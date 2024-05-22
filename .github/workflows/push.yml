@@ -19,6 +19,8 @@ jobs:
           npm install
           npm run compile
       - run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
           vsce publish patch --pre-release --pat $VSCODE_MARKETPLACE_TOKEN
         env:
           VSCODE_MARKETPLACE_TOKEN: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
