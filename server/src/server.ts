@@ -11,6 +11,7 @@ import { validateDocument } from "./_diagnostics/validateDocument";
 import { connection } from "./_shared/connection";
 import { getCodeActions } from "./getCodeActions";
 import { getExecuteCommand } from "./getExecuteCommand";
+import getDocumentLinks from "./getDocumentLinks";
 
 export type Connection = typeof connection;
 
@@ -27,6 +28,7 @@ connection.onInitialize((params) => {
       codeActionProvider: true,
       hoverProvider: true,
       definitionProvider: true,
+      documentLinkProvider: { resolveProvider: false },
       diagnosticProvider: {
         interFileDependencies: false,
         workspaceDiagnostics: false,
@@ -43,6 +45,7 @@ connection.onCompletion(async (c) => await getCompletions(c));
 connection.onDefinition((d) => getDefinition(d));
 connection.onCodeAction((c) => getCodeActions(c));
 connection.onExecuteCommand((e) => getExecuteCommand(e));
+connection.onDocumentLinks((l) => getDocumentLinks(l));
 
 connection.languages.diagnostics.on(async (params) => ({
   kind: DocumentDiagnosticReportKind.Full,

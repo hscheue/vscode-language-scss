@@ -2,7 +2,7 @@ import { existsSync } from "fs";
 import { join } from "path";
 
 import { settings } from "./settings";
-import type { Root } from "postcss";
+import type { ChildNode, Root } from "postcss";
 
 export function resolveReference(ref: string, baseUrl: string) {
   if (ref.startsWith("https://") || ref.startsWith("http://")) {
@@ -73,6 +73,31 @@ export function getLinks(root: Root, baseURL: string, set: Set<string>) {
       if (link && !set.has(link)) {
         set.add(link);
         linkURI.push(link);
+      }
+    }
+  });
+
+  return linkURI;
+}
+
+/* FIXME */
+export function getLinks2(root: Root, baseURL: string, set: Set<string>) {
+  const linkURI: { target: string; node: ChildNode }[] = [];
+
+  root.walk((node) => {
+    if (
+      node.type === "atrule" &&
+      (node.name === "use" || node.name === "import")
+    ) {
+      /** FIXME */
+      const path = node.params.split('"')[1];
+      const path2 = node.params.split("'")[1];
+      const p = path ?? path2;
+      if (!p) return;
+      const link = resolveReference(p, baseURL);
+      if (link && !set.has(link)) {
+        set.add(link);
+        linkURI.push({ target: link, node });
       }
     }
   });
