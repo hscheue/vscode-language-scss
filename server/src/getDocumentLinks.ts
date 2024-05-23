@@ -1,5 +1,5 @@
 import { DocumentLink, DocumentLinkParams } from "vscode-languageserver";
-import { getLinks, getLinks2 } from "./_shared/resolveReference";
+import { getLinks } from "./_shared/resolveReference";
 import { getDocument } from "./_shared/getDocument";
 import { parse } from "postcss-scss";
 import { convertRange } from "./_shared/getRangeFromNode";
@@ -9,11 +9,19 @@ export default function getDocumentLinks(
 ): DocumentLink[] {
   const d = getDocument(params.textDocument.uri);
   if (!d) return [];
+  const root = parse(d.getText());
 
-  const text = d.getText();
-  const root = parse(text);
+  const links = getLinks(root, d.uri, new Set());
+  const documentLinks: DocumentLink[] = [];
 
-  const links = getLinks2(root, d.uri, new Set());
+  links.forEach((link) => {
+    const next = {
+      range: convertRange(link.node.rangeBy({ word: link.src })),
+      target: link.uri,
+    } satisfies DocumentLink;
 
-  return [];
+    documentLinks.push(next);
+  });
+
+  return documentLinks;
 }

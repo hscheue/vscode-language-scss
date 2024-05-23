@@ -38,7 +38,9 @@ function _getNodeSymbolsRec(uri: string, set: Set<string>): NodeSymbol[] {
 
   const links = getLinks(root, uri, set);
 
-  const linkedSymbols = links.flatMap((link) => _getNodeSymbolsRec(link, set));
+  const linkedSymbols = links.flatMap((link) =>
+    _getNodeSymbolsRec(link.uri, set)
+  );
 
   root.walk((node) => {
     if (node.type === "decl" && node.variable) {

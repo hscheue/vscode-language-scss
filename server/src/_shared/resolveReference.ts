@@ -57,47 +57,19 @@ function getString(ref: string, baseUrl: string, slash: boolean, dist?: true) {
 }
 
 export function getLinks(root: Root, baseURL: string, set: Set<string>) {
-  const linkURI: string[] = [];
+  const linkURI: { node: ChildNode; uri: string; src: string }[] = [];
 
   root.walk((node) => {
     if (
       node.type === "atrule" &&
       (node.name === "use" || node.name === "import")
     ) {
-      /** FIXME */
-      const path = node.params.split('"')[1];
-      const path2 = node.params.split("'")[1];
-      const p = path ?? path2;
-      if (!p) return;
-      const link = resolveReference(p, baseURL);
-      if (link && !set.has(link)) {
-        set.add(link);
-        linkURI.push(link);
-      }
-    }
-  });
-
-  return linkURI;
-}
-
-/* FIXME */
-export function getLinks2(root: Root, baseURL: string, set: Set<string>) {
-  const linkURI: { target: string; node: ChildNode }[] = [];
-
-  root.walk((node) => {
-    if (
-      node.type === "atrule" &&
-      (node.name === "use" || node.name === "import")
-    ) {
-      /** FIXME */
-      const path = node.params.split('"')[1];
-      const path2 = node.params.split("'")[1];
-      const p = path ?? path2;
-      if (!p) return;
-      const link = resolveReference(p, baseURL);
-      if (link && !set.has(link)) {
-        set.add(link);
-        linkURI.push({ target: link, node });
+      const src = node.params.split('"')[1] ?? node.params.split("'")[1];
+      if (!src) return;
+      const uri = resolveReference(src, baseURL);
+      if (uri && !set.has(uri)) {
+        set.add(uri);
+        linkURI.push({ uri, node, src });
       }
     }
   });
