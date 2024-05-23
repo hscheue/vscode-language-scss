@@ -1,10 +1,7 @@
-import {
-  DocumentDiagnosticReportKind,
-  TextDocumentSyncKind,
-} from "vscode-languageserver/node";
+import { TextDocumentSyncKind } from "vscode-languageserver/node";
 import { settings } from "./_shared/settings";
 import { getCompletions } from "./getCompletions";
-import { postcssListen } from "./_shared/getDocument";
+import { documents } from "./_shared/getDocument";
 import { getHover } from "./getHover";
 import { getDefinition } from "./getDefinition";
 import { validateDocument } from "./_diagnostics/validateDocument";
@@ -47,10 +44,12 @@ connection.onCodeAction((c) => getCodeActions(c));
 connection.onExecuteCommand((e) => getExecuteCommand(e));
 connection.onDocumentLinks((l) => getDocumentLinks(l));
 
-connection.languages.diagnostics.on(async (params) => ({
-  kind: DocumentDiagnosticReportKind.Full,
-  items: await validateDocument(params.textDocument.uri),
-}));
+documents.onDidChangeContent(async (e) => {
+  connection.sendDiagnostics({
+    uri: e.document.uri,
+    diagnostics: await validateDocument(e.document.uri),
+  });
+});
 
-postcssListen(connection);
+documents.listen(connection);
 connection.listen();
