@@ -16,17 +16,34 @@ function _addDiagnostic(
     const root = parse(doc.getText());
 
     root.walk((node) => {
-      if (node.type === "decl" && theme[node.value]) {
-        const range = convertRange(node.rangeBy({ word: node.value }));
-        if (!range) return;
-        const prop = theme[node.value];
-        diagnostics.push({
-          severity: DiagnosticSeverity.Error,
-          message: `${prop} exists in theme file`,
-          source: "vscode-language-scss",
-          data: { value: prop },
-          range,
-        });
+      if (node.type === "decl") {
+        if (theme[node.value]) {
+          const range = convertRange(node.rangeBy({ word: node.value }));
+          if (!range) return;
+          const prop = theme[node.value];
+          diagnostics.push({
+            severity: DiagnosticSeverity.Error,
+            message: `${prop} exists in theme file`,
+            source: "vscode-language-scss",
+            data: { value: prop },
+            range,
+          });
+        } else {
+          // partial theme value validation just for hex colors
+          // i.e. border: 1px solid $color
+          const value = /#([a-f0-9])+/i.exec(node.value)?.[0];
+          if (value && theme[value]) {
+            const prop = theme[value];
+            const range = convertRange(node.rangeBy({ word: value }));
+            diagnostics.push({
+              severity: DiagnosticSeverity.Error,
+              message: `${prop} exists in theme file`,
+              source: "vscode-language-scss",
+              data: { value: prop },
+              range,
+            });
+          }
+        }
       }
     });
 
