@@ -10,7 +10,6 @@ import {
 import { asyncThemeDiagnosticsFile } from "./_shared/settings";
 import { connection } from "./_shared/connection";
 import { resolveReference } from "./_shared/resolveReference";
-import { getThemeValues } from "./_diagnostics/getThemeValues";
 
 export async function getCompletions(
   completion: CompletionParams
