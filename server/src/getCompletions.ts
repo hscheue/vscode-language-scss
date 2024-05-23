@@ -7,9 +7,7 @@ import {
   CompletionParams,
   CompletionItemKind,
 } from "vscode-languageserver";
-import { asyncThemeDiagnosticsFile } from "./_shared/settings";
-import { connection } from "./_shared/connection";
-import { resolveReference } from "./_shared/resolveReference";
+import { getThemeSrc } from "./_shared/settings";
 
 export async function getCompletions(
   completion: CompletionParams
@@ -50,32 +48,13 @@ export async function getCompletions(
 }
 
 async function addThemeCompletion(completions: CompletionItem[], uri: string) {
-  const src = await getThemeSrc(uri);
+  const theme = await getThemeSrc(uri);
 
-  if (!src) return;
+  if (!theme) return;
 
   completions.push({
     label: "theme",
     kind: CompletionItemKind.Snippet,
-    insertText: `@use '${src}' as *;`,
+    insertText: `@use '${theme.src}' as *;`,
   });
-}
-
-async function getThemeSrc(uri: string) {
-  const themeSetting = await asyncThemeDiagnosticsFile(connection);
-  if (!themeSetting) return null;
-
-  if (Array.isArray(themeSetting)) {
-    for (const theme of themeSetting) {
-      const themeUri = resolveReference(theme, uri);
-      if (!themeUri) continue;
-      return theme;
-    }
-
-    return null;
-  }
-
-  const themeUri = resolveReference(themeSetting, uri);
-  if (!themeUri) return null;
-  return themeSetting;
 }
