@@ -39,7 +39,7 @@ connection.onInitialize((params) => {
 });
 
 connection.onHover((h) => getHover(h));
-connection.onCompletion((c) => getCompletions(c));
+connection.onCompletion(async (c) => await getCompletions(c));
 connection.onDefinition((d) => getDefinition(d));
 connection.onCodeAction((c) => getCodeActions(c));
 connection.onExecuteCommand((e) => getExecuteCommand(e));
