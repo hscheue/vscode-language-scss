@@ -1,11 +1,9 @@
 import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
 import { getThemeValues } from "./getThemeValues";
-import { resolveReference } from "../_shared/resolveReference";
 import { getDocument } from "../_shared/getDocument";
 import { parse } from "postcss-scss";
 import { convertRange } from "../_shared/getRangeFromNode";
-import { asyncThemeDiagnosticsFile } from "../_shared/settings";
-import { connection } from "../_shared/connection";
+import { getThemeSrc } from "../_shared/settings";
 
 function _addDiagnostic(
   uri: string,
@@ -39,29 +37,14 @@ function _addDiagnostic(
 }
 
 export async function validateDocument(uri: string): Promise<Diagnostic[]> {
-  const themeSetting = await asyncThemeDiagnosticsFile(connection);
-  if (!themeSetting) return [];
+  const theme = await getThemeSrc(uri);
+  if (!theme) return [];
   const diagnostics: Diagnostic[] = [];
 
-  if (Array.isArray(themeSetting)) {
-    for (const theme of themeSetting) {
-      const themeUri = resolveReference(theme, uri);
-      if (!themeUri) continue;
-
-      const { record, files } = getThemeValues(themeUri);
-      if (!files.includes(uri) && themeUri !== uri) {
-        _addDiagnostic(uri, record, diagnostics);
-      }
-      return diagnostics;
-    }
-
-    return [];
-  }
-
-  const themeUri = resolveReference(themeSetting, uri);
-  const { record, files } = getThemeValues(themeUri);
-  if (!files.includes(uri) && themeUri !== uri) {
+  const { record, files } = getThemeValues(theme.uri);
+  if (!files.includes(uri) && theme.uri !== uri) {
     _addDiagnostic(uri, record, diagnostics);
   }
+
   return diagnostics;
 }
