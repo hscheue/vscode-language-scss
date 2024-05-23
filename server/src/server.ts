@@ -26,10 +26,6 @@ connection.onInitialize((params) => {
       hoverProvider: true,
       definitionProvider: true,
       documentLinkProvider: { resolveProvider: false },
-      diagnosticProvider: {
-        interFileDependencies: false,
-        workspaceDiagnostics: false,
-      },
       executeCommandProvider: {
         commands: ["theme.quickFix"],
       },
