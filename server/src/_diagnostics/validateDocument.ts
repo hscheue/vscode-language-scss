@@ -59,7 +59,11 @@ export async function validateDocument(uri: string): Promise<Diagnostic[]> {
   const diagnostics: Diagnostic[] = [];
 
   const { record, files } = getThemeValues(theme.uri);
-  if (!files.includes(uri) && theme.uri !== uri) {
+  if (
+    !files.includes(uri) &&
+    theme.uri !== uri &&
+    !uri.includes("/node_modules/")
+  ) {
     _addDiagnostic(uri, record, diagnostics);
   }
 
