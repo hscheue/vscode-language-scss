@@ -3,7 +3,7 @@ import { getThemeValues } from "./getThemeValues";
 import { getDocument } from "../_shared/getDocument";
 import { parse } from "postcss-scss";
 import { convertRange } from "../_shared/getRangeFromNode";
-import { getThemeSrc } from "../_shared/settings";
+import { asyncThemeMixinDiagnostics, getThemeSrc } from "../_shared/settings";
 
 function _addDiagnostic(
   uri: string,
@@ -53,18 +53,65 @@ function _addDiagnostic(
   }
 }
 
+function _addMixinDiagnostic(
+  uri: string,
+  mixins: { label: string; lines: Record<string, true> }[],
+  diagnostics: Diagnostic[]
+) {
+  const doc = getDocument(uri);
+  if (!doc) return;
+  try {
+    const root = parse(doc.getText());
+
+    root.walk((node) => {
+      if (node.type === "rule") {
+        const lines = new Set<string>();
+        node.nodes.forEach((n) => lines.add(n.toString()));
+
+        for (const mixin of mixins) {
+          const hasMixin = Object.keys(mixin.lines).every((line) => {
+            return lines.has(line);
+          });
+          if (hasMixin) {
+            const range = convertRange(node.rangeBy({ word: node.selector }));
+            if (!range) return;
+            const prop = mixin.label;
+            diagnostics.push({
+              severity: DiagnosticSeverity.Error,
+              message: `${prop} exists in theme file\n${Object.keys(
+                mixin.lines
+              ).join("\n")}`,
+              source: "vscode-language-scss",
+              data: { value: prop },
+              range,
+            });
+          }
+        }
+      }
+    });
+
+    return diagnostics;
+  } catch (err) {
+    return [];
+  }
+}
+
 export async function validateDocument(uri: string): Promise<Diagnostic[]> {
   const theme = await getThemeSrc(uri);
   if (!theme) return [];
   const diagnostics: Diagnostic[] = [];
+  const enabledMixins = await asyncThemeMixinDiagnostics();
 
-  const { record, files } = getThemeValues(theme.uri);
+  const { record, mixins, files } = getThemeValues(theme.uri);
   if (
     !files.includes(uri) &&
     theme.uri !== uri &&
     !uri.includes("/node_modules/")
   ) {
     _addDiagnostic(uri, record, diagnostics);
+    if (enabledMixins) {
+      _addMixinDiagnostic(uri, mixins, diagnostics);
+    }
   }
 
   return diagnostics;

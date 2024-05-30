@@ -43,6 +43,12 @@
           ],
           "default": "",
           "description": "Enable experimental theme diagnostic highlighting"
+        },
+        "vscode-language-scss.experimental.themeMixinDiagnostics": {
+          "scope": "resource",
+          "type": "boolean",
+          "default": false,
+          "description": "Enable experimental mixin theme diagnostics"
         }
       }
     }
