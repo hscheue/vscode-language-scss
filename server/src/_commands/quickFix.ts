@@ -1,20 +1,18 @@
 import { Range } from "vscode-languageserver/node";
 
-export const keyVariableThemeQuickFix = "theme.quickFix";
+export const theme_fix_variable = "theme.quickFix";
 
-export type FixMeCommand = {
-  type: typeof keyVariableThemeQuickFix;
-  uri: string;
+export type VariableDiagnostics = {
   range: Range;
   value: string;
 };
 
-export const keyMixinThemeQuickFix = "theme.quickFix.mixin";
+export const theme_fix_mixin = "theme.quickFix.mixin";
 
-export type FixMeCommandMixin = {
-  type: typeof keyMixinThemeQuickFix;
-  uri: string;
+export type MixinDiagnostics = {
   range: Range;
   label: string;
-  lines: string;
+  lines: string[];
 };
+
+export type CommandShared<T> = T & { uri: string };
