@@ -104,6 +104,9 @@ function _addMixinDiagnostic(
                 type: theme_fix_mixin,
                 label: prop,
                 lines: Object.keys(mixin.lines),
+                lineRanges: Object.keys(mixin.lines).map((word) => {
+                  return convertRange(node.rangeBy({ word }));
+                }),
                 range,
               } satisfies MixinDiagnostics & {
                 type: typeof theme_fix_mixin;

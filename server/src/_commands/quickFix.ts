@@ -13,6 +13,7 @@ export type MixinDiagnostics = {
   range: Range;
   label: string;
   lines: string[];
+  lineRanges: Range[];
 };
 
 export type CommandShared<T> = T & { uri: string };

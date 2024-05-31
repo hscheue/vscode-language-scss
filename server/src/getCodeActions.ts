@@ -3,6 +3,7 @@ import {
   CodeActionKind,
   CodeActionParams,
   Command,
+  Range,
 } from "vscode-languageserver";
 import { getDocument } from "./_shared/getDocument";
 import {
@@ -81,6 +82,9 @@ function getFixMeCommandMixin(
   const type = params.context.diagnostics[0]?.data?.type;
   const label = params.context.diagnostics[0]?.data?.label;
   const lines = params.context.diagnostics[0]?.data?.lines;
+  const lineRanges = params.context.diagnostics[0]?.data?.lineRanges as
+    | undefined
+    | Range[];
 
   if (!label || typeof label !== "string") return null;
   if (
@@ -90,6 +94,7 @@ function getFixMeCommandMixin(
     lines.some((l) => typeof l !== "string")
   )
     return null;
+  if (!lineRanges) return null;
   if (!range || !type) return null;
   if (type !== theme_fix_mixin) return null;
 
@@ -97,5 +102,6 @@ function getFixMeCommandMixin(
     range,
     label,
     lines,
+    lineRanges,
   };
 }
