@@ -4,6 +4,12 @@ import { getDocument } from "../_shared/getDocument";
 import { parse } from "postcss-scss";
 import { convertRange } from "../_shared/getRangeFromNode";
 import { asyncThemeMixinDiagnostics, getThemeSrc } from "../_shared/settings";
+import {
+  MixinDiagnostics,
+  VariableDiagnostics,
+  theme_fix_mixin,
+  theme_fix_variable,
+} from "../_commands/quickFix";
 
 function _addDiagnostic(
   uri: string,
@@ -25,7 +31,13 @@ function _addDiagnostic(
             severity: DiagnosticSeverity.Error,
             message: `${prop} exists in theme file`,
             source: "vscode-language-scss",
-            data: { value: prop },
+            data: {
+              type: theme_fix_variable,
+              value: prop,
+              range,
+            } satisfies VariableDiagnostics & {
+              type: typeof theme_fix_variable;
+            },
             range,
           });
         } else {
@@ -39,7 +51,13 @@ function _addDiagnostic(
               severity: DiagnosticSeverity.Error,
               message: `${prop} exists in theme file`,
               source: "vscode-language-scss",
-              data: { value: prop },
+              data: {
+                type: theme_fix_variable,
+                value: prop,
+                range,
+              } satisfies VariableDiagnostics & {
+                type: typeof theme_fix_variable;
+              },
               range,
             });
           }
@@ -82,7 +100,17 @@ function _addMixinDiagnostic(
                 mixin.lines
               ).join("\n")}`,
               source: "vscode-language-scss",
-              data: { value: prop },
+              data: {
+                type: theme_fix_mixin,
+                label: prop,
+                lines: Object.keys(mixin.lines),
+                lineRanges: Object.keys(mixin.lines).map((word) => {
+                  return convertRange(node.rangeBy({ word }));
+                }),
+                range,
+              } satisfies MixinDiagnostics & {
+                type: typeof theme_fix_mixin;
+              },
               range,
             });
           }
