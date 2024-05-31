@@ -9,6 +9,10 @@ import { connection } from "./_shared/connection";
 import { getCodeActions } from "./getCodeActions";
 import { getExecuteCommand } from "./getExecuteCommand";
 import getDocumentLinks from "./getDocumentLinks";
+import {
+  keyMixinThemeQuickFix,
+  keyVariableThemeQuickFix,
+} from "./_commands/quickFix";
 
 export type Connection = typeof connection;
 
@@ -27,7 +31,7 @@ connection.onInitialize((params) => {
       definitionProvider: true,
       documentLinkProvider: { resolveProvider: false },
       executeCommandProvider: {
-        commands: ["theme.quickFix"],
+        commands: [keyVariableThemeQuickFix, keyMixinThemeQuickFix],
       },
     },
   };

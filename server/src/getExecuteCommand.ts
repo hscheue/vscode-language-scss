@@ -4,10 +4,14 @@ import {
   TextEdit,
 } from "vscode-languageserver";
 import { getDocument } from "./_shared/getDocument";
-import { FixMeCommand, connection } from "./_shared/connection";
+import { connection } from "./_shared/connection";
+import { FixMeCommand, keyVariableThemeQuickFix } from "./_commands/quickFix";
 
 export function getExecuteCommand(params: ExecuteCommandParams): void {
-  if (params.command !== "theme.quickFix" || params.arguments === undefined)
+  if (
+    params.command !== keyVariableThemeQuickFix ||
+    params.arguments === undefined
+  )
     return;
   const args: FixMeCommand = params.arguments[0];
   const doc = getDocument(args.uri);
