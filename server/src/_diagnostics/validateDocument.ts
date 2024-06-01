@@ -6,9 +6,8 @@ import { convertRange } from "../_shared/getRangeFromNode";
 import { asyncThemeMixinDiagnostics, getThemeSrc } from "../_shared/settings";
 import {
   MixinDiagnostics,
-  VariableDiagnostics,
+  VariableDiagnostic,
   theme_fix_mixin,
-  theme_fix_variable,
 } from "../_commands/quickFix";
 
 function _addDiagnostic(
@@ -31,13 +30,7 @@ function _addDiagnostic(
             severity: DiagnosticSeverity.Error,
             message: `${prop} exists in theme file`,
             source: "vscode-language-scss",
-            data: {
-              type: theme_fix_variable,
-              value: prop,
-              range,
-            } satisfies VariableDiagnostics & {
-              type: typeof theme_fix_variable;
-            },
+            data: VariableDiagnostic.create(range, prop),
             range,
           });
         } else {
@@ -51,13 +44,7 @@ function _addDiagnostic(
               severity: DiagnosticSeverity.Error,
               message: `${prop} exists in theme file`,
               source: "vscode-language-scss",
-              data: {
-                type: theme_fix_variable,
-                value: prop,
-                range,
-              } satisfies VariableDiagnostics & {
-                type: typeof theme_fix_variable;
-              },
+              data: VariableDiagnostic.create(range, prop),
               range,
             });
           }

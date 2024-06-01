@@ -8,10 +8,9 @@ import {
 import { getDocument } from "./_shared/getDocument";
 import {
   CommandShared,
-  VariableDiagnostics,
   MixinDiagnostics,
   theme_fix_mixin,
-  theme_fix_variable,
+  VariableDiagnostic,
 } from "./_commands/quickFix";
 
 export function getCodeActions(params: CodeActionParams): CodeAction[] {
@@ -21,7 +20,7 @@ export function getCodeActions(params: CodeActionParams): CodeAction[] {
   const a = getFixMeCommand(params);
   if (a) {
     return [
-      createCodeAction("Replace with theme value", theme_fix_variable, {
+      createCodeAction("Replace with theme value", VariableDiagnostic.command, {
         uri: doc.uri,
         ...a,
       }),
@@ -44,20 +43,18 @@ export function getCodeActions(params: CodeActionParams): CodeAction[] {
 function createCodeAction(
   title: string,
   key: string,
-  data: CommandShared<MixinDiagnostics | VariableDiagnostics>
+  data: CommandShared<MixinDiagnostics | VariableDiagnostic>
 ) {
   return CodeAction.create(
     title,
     Command.create(title, key, {
       ...data,
-    } satisfies CommandShared<MixinDiagnostics | VariableDiagnostics>),
+    } satisfies CommandShared<MixinDiagnostics | VariableDiagnostic>),
     CodeActionKind.QuickFix
   );
 }
 
-function getFixMeCommand(
-  params: CodeActionParams
-): Omit<VariableDiagnostics, "uri"> | null {
+function getFixMeCommand(params: CodeActionParams) {
   if (!("diagnostics" in params.context)) return null;
   if (!params.context.diagnostics.length) return null;
   const range = params.context.diagnostics[0]?.range;
@@ -65,11 +62,8 @@ function getFixMeCommand(
   const value = params.context.diagnostics[0]?.data?.value;
   if (!value || typeof value !== "string") return null;
   if (!range || !type) return null;
-  if (type !== theme_fix_variable) return null;
-  return {
-    range,
-    value,
-  };
+  if (type !== VariableDiagnostic.command) return null;
+  return VariableDiagnostic.create(range, value);
 }
 
 function getFixMeCommandMixin(
