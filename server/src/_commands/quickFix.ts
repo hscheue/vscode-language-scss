@@ -16,11 +16,12 @@ export class VariableDiagnostic {
     return new VariableDiagnostic(range, value);
   }
 
-  static is(value: unknown) {
+  static is(value: unknown): value is VariableDiagnostic {
     if (!value) return false;
     if (typeof value !== "object") return false;
     if (!("type" in value)) return false;
     if (value.type === this.command) return true;
+    return false;
   }
 }
 
