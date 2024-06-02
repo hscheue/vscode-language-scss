@@ -9,7 +9,7 @@ import { connection } from "./_shared/connection";
 import { getCodeActions } from "./getCodeActions";
 import { getExecuteCommand } from "./getExecuteCommand";
 import getDocumentLinks from "./getDocumentLinks";
-import { VariableDiagnostic, theme_fix_mixin } from "./_commands/quickFix";
+import { MixinDiagnostic, VariableDiagnostic } from "./_commands/quickFix";
 
 export type Connection = typeof connection;
 
@@ -28,7 +28,7 @@ connection.onInitialize((params) => {
       definitionProvider: true,
       documentLinkProvider: { resolveProvider: false },
       executeCommandProvider: {
-        commands: [VariableDiagnostic.command, theme_fix_mixin],
+        commands: [VariableDiagnostic.command, MixinDiagnostic.command],
       },
     },
   };

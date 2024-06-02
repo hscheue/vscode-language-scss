@@ -8,8 +8,7 @@ import {
 import { getDocument } from "./_shared/getDocument";
 import {
   CommandShared,
-  MixinDiagnostics,
-  theme_fix_mixin,
+  MixinDiagnostic,
   VariableDiagnostic,
 } from "./_commands/quickFix";
 
@@ -30,7 +29,7 @@ export function getCodeActions(params: CodeActionParams): CodeAction[] {
   const b = getFixMeCommandMixin(params);
   if (b) {
     return [
-      createCodeAction("Replace lines with mixin", theme_fix_mixin, {
+      createCodeAction("Replace lines with mixin", MixinDiagnostic.command, {
         uri: doc.uri,
         ...b,
       }),
@@ -43,13 +42,13 @@ export function getCodeActions(params: CodeActionParams): CodeAction[] {
 function createCodeAction(
   title: string,
   key: string,
-  data: CommandShared<MixinDiagnostics | VariableDiagnostic>
+  data: CommandShared<MixinDiagnostic | VariableDiagnostic>
 ) {
   return CodeAction.create(
     title,
     Command.create(title, key, {
       ...data,
-    } satisfies CommandShared<MixinDiagnostics | VariableDiagnostic>),
+    } satisfies CommandShared<MixinDiagnostic | VariableDiagnostic>),
     CodeActionKind.QuickFix
   );
 }
@@ -66,9 +65,7 @@ function getFixMeCommand(params: CodeActionParams) {
   return VariableDiagnostic.create(range, value);
 }
 
-function getFixMeCommandMixin(
-  params: CodeActionParams
-): Omit<MixinDiagnostics, "uri"> | null {
+function getFixMeCommandMixin(params: CodeActionParams) {
   if (!("diagnostics" in params.context)) return null;
   if (!params.context.diagnostics.length) return null;
 
@@ -90,12 +87,6 @@ function getFixMeCommandMixin(
     return null;
   if (!lineRanges) return null;
   if (!range || !type) return null;
-  if (type !== theme_fix_mixin) return null;
-
-  return {
-    range,
-    label,
-    lines,
-    lineRanges,
-  };
+  if (type !== MixinDiagnostic.command) return null;
+  return MixinDiagnostic.create(range, label, lines, lineRanges);
 }

@@ -9,9 +9,8 @@ import { getDocument } from "./_shared/getDocument";
 import { connection } from "./_shared/connection";
 import {
   CommandShared,
-  MixinDiagnostics,
+  MixinDiagnostic,
   VariableDiagnostic,
-  theme_fix_mixin,
 } from "./_commands/quickFix";
 
 export function getExecuteCommand(params: ExecuteCommandParams): void {
@@ -32,8 +31,8 @@ export function getExecuteCommand(params: ExecuteCommandParams): void {
     return;
   }
 
-  if (params.command === theme_fix_mixin) {
-    const args: CommandShared<MixinDiagnostics> = params.arguments[0];
+  if (params.command === MixinDiagnostic.command) {
+    const args: CommandShared<MixinDiagnostic> = params.arguments[0];
     const doc = getDocument(args.uri);
     if (doc === undefined) return;
 
