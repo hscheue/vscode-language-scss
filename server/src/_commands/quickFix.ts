@@ -2,7 +2,7 @@ import { Range } from "vscode-languageserver/node";
 
 export class VariableDiagnostic {
   static command = "theme.quickFix";
-  readonly type = "theme.quickFix";
+  readonly type = VariableDiagnostic.command;
   range: Range;
   value: string;
   uri?: string;
