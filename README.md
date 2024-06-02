@@ -2,6 +2,8 @@
 
 A language service for scss built without implicit link concerns.
 
+![](./diagnostics-demo.gif)
+
 ## Installation
 
 1. Download `vscode-language-scss-*.vsix` from assets section of [latest release](https://github.com/hscheue/vscode-language-scss/releases).
