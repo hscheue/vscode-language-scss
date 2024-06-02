@@ -4,12 +4,7 @@ import { getDocument } from "../_shared/getDocument";
 import { parse } from "postcss-scss";
 import { convertRange } from "../_shared/getRangeFromNode";
 import { asyncThemeMixinDiagnostics, getThemeSrc } from "../_shared/settings";
-import {
-  MixinDiagnostics,
-  VariableDiagnostics,
-  theme_fix_mixin,
-  theme_fix_variable,
-} from "../_commands/quickFix";
+import { MixinDiagnostic, VariableDiagnostic } from "../_commands/quickFix";
 
 function _addDiagnostic(
   uri: string,
@@ -26,18 +21,12 @@ function _addDiagnostic(
         if (theme[node.value]) {
           const range = convertRange(node.rangeBy({ word: node.value }));
           if (!range) return;
-          const prop = theme[node.value];
+          const label = theme[node.value];
           diagnostics.push({
             severity: DiagnosticSeverity.Error,
-            message: `${prop} exists in theme file`,
+            message: `${label} exists in theme file`,
             source: "vscode-language-scss",
-            data: {
-              type: theme_fix_variable,
-              value: prop,
-              range,
-            } satisfies VariableDiagnostics & {
-              type: typeof theme_fix_variable;
-            },
+            data: VariableDiagnostic.create(range, label),
             range,
           });
         } else {
@@ -51,13 +40,7 @@ function _addDiagnostic(
               severity: DiagnosticSeverity.Error,
               message: `${prop} exists in theme file`,
               source: "vscode-language-scss",
-              data: {
-                type: theme_fix_variable,
-                value: prop,
-                range,
-              } satisfies VariableDiagnostics & {
-                type: typeof theme_fix_variable;
-              },
+              data: VariableDiagnostic.create(range, prop),
               range,
             });
           }
@@ -93,24 +76,21 @@ function _addMixinDiagnostic(
           if (hasMixin) {
             const range = convertRange(node.rangeBy({ word: node.selector }));
             if (!range) return;
-            const prop = mixin.label;
+            const label = mixin.label;
             diagnostics.push({
               severity: DiagnosticSeverity.Error,
-              message: `${prop} exists in theme file\n${Object.keys(
+              message: `${label} exists in theme file\n${Object.keys(
                 mixin.lines
               ).join("\n")}`,
               source: "vscode-language-scss",
-              data: {
-                type: theme_fix_mixin,
-                label: prop,
-                lines: Object.keys(mixin.lines),
-                lineRanges: Object.keys(mixin.lines).map((word) => {
-                  return convertRange(node.rangeBy({ word }));
-                }),
+              data: MixinDiagnostic.create(
                 range,
-              } satisfies MixinDiagnostics & {
-                type: typeof theme_fix_mixin;
-              },
+                label,
+                Object.keys(mixin.lines),
+                Object.keys(mixin.lines).map((word) => {
+                  return convertRange(node.rangeBy({ word }));
+                })
+              ),
               range,
             });
           }

@@ -9,17 +9,15 @@ import { getDocument } from "./_shared/getDocument";
 import { connection } from "./_shared/connection";
 import {
   CommandShared,
-  MixinDiagnostics,
-  VariableDiagnostics,
-  theme_fix_mixin,
-  theme_fix_variable,
+  MixinDiagnostic,
+  VariableDiagnostic,
 } from "./_commands/quickFix";
 
 export function getExecuteCommand(params: ExecuteCommandParams): void {
   if (params.arguments === undefined) return;
 
-  if (params.command === theme_fix_variable) {
-    const args: CommandShared<VariableDiagnostics> = params.arguments[0];
+  if (params.command === VariableDiagnostic.command) {
+    const args: CommandShared<VariableDiagnostic> = params.arguments[0];
     const doc = getDocument(args.uri);
     if (doc === undefined) return;
 
@@ -33,8 +31,8 @@ export function getExecuteCommand(params: ExecuteCommandParams): void {
     return;
   }
 
-  if (params.command === theme_fix_mixin) {
-    const args: CommandShared<MixinDiagnostics> = params.arguments[0];
+  if (params.command === MixinDiagnostic.command) {
+    const args: CommandShared<MixinDiagnostic> = params.arguments[0];
     const doc = getDocument(args.uri);
     if (doc === undefined) return;
 
