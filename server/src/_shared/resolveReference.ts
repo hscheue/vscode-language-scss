@@ -45,15 +45,16 @@ function resolveFor(url: string): string | undefined {
 }
 
 function getString(ref: string, baseUrl: string, slash: boolean, dist?: true) {
-  if (!slash) return new URL(`${ref}.scss`, baseUrl).toString();
-  const parts = ref.split("/");
+  let refScss = ref.endsWith(".scss") ? ref : `${ref}.scss`;
+  if (!slash) return new URL(refScss, baseUrl).toString();
+  const parts = refScss.split("/");
   if (dist) {
     parts[parts.length - 1] = `dist/_${parts[parts.length - 1]}`;
   } else {
     parts[parts.length - 1] = `_${parts[parts.length - 1]}`;
   }
-  ref = parts.join("/");
-  return new URL(`${ref}.scss`, baseUrl).toString();
+  refScss = parts.join("/");
+  return new URL(refScss, baseUrl).toString();
 }
 
 export function getLinks(root: Root, baseURL: string, set: Set<string>) {
