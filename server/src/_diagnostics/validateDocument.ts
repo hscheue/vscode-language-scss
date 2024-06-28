@@ -18,17 +18,34 @@ function _addDiagnostic(
 
     root.walk((node) => {
       if (node.type === "decl") {
-        if (theme[node.value]) {
+        const themeVariable = theme[node.value];
+
+        if (themeVariable) {
           const range = convertRange(node.rangeBy({ word: node.value }));
           if (!range) return;
-          const label = theme[node.value];
-          diagnostics.push({
-            severity: DiagnosticSeverity.Error,
-            message: `${label} exists in theme file`,
-            source: "vscode-language-scss",
-            data: VariableDiagnostic.create(range, label),
-            range,
-          });
+
+          if (themeVariable.startsWith("$spacing")) {
+            if (
+              node.prop.startsWith("padding") ||
+              node.prop.startsWith("margin")
+            ) {
+              diagnostics.push({
+                severity: DiagnosticSeverity.Error,
+                message: `${themeVariable} exists in theme file`,
+                source: "vscode-language-scss",
+                data: VariableDiagnostic.create(range, themeVariable),
+                range,
+              });
+            }
+          } else {
+            diagnostics.push({
+              severity: DiagnosticSeverity.Error,
+              message: `${themeVariable} exists in theme file`,
+              source: "vscode-language-scss",
+              data: VariableDiagnostic.create(range, themeVariable),
+              range,
+            });
+          }
         } else {
           // partial theme value validation just for hex colors
           // i.e. border: 1px solid $color
