@@ -1,15 +1,20 @@
-import { Diagnostic, DiagnosticSeverity } from "vscode-languageserver";
+import { Diagnostic, DiagnosticSeverity, Range } from "vscode-languageserver";
 import { getThemeValues } from "./getThemeValues";
 import { getDocument } from "../_shared/getDocument";
 import { parse } from "postcss-scss";
 import { convertRange } from "../_shared/getRangeFromNode";
-import { asyncThemeMixinDiagnostics, getThemeSrc } from "../_shared/settings";
+import {
+  asyncThemeMixinDiagnostics,
+  asyncThemeSpacingPrefix,
+  getThemeSrc,
+} from "../_shared/settings";
 import { MixinDiagnostic, VariableDiagnostic } from "../_commands/quickFix";
 
 function _addDiagnostic(
   uri: string,
   theme: Record<string, string>,
-  diagnostics: Diagnostic[]
+  diagnostics: Diagnostic[],
+  spacingPrefix: string | undefined
 ) {
   const doc = getDocument(uri);
   if (!doc) return;
@@ -24,27 +29,16 @@ function _addDiagnostic(
           const range = convertRange(node.rangeBy({ word: node.value }));
           if (!range) return;
 
-          if (themeVariable.startsWith("$spacing")) {
+          if (spacingPrefix && themeVariable.startsWith(spacingPrefix)) {
             if (
               node.prop.startsWith("padding") ||
-              node.prop.startsWith("margin")
+              node.prop.startsWith("margin") ||
+              node.prop.endsWith("gap")
             ) {
-              diagnostics.push({
-                severity: DiagnosticSeverity.Error,
-                message: `${themeVariable} exists in theme file`,
-                source: "vscode-language-scss",
-                data: VariableDiagnostic.create(range, themeVariable),
-                range,
-              });
+              sendVariableDiagnostic(diagnostics, themeVariable, range);
             }
           } else {
-            diagnostics.push({
-              severity: DiagnosticSeverity.Error,
-              message: `${themeVariable} exists in theme file`,
-              source: "vscode-language-scss",
-              data: VariableDiagnostic.create(range, themeVariable),
-              range,
-            });
+            sendVariableDiagnostic(diagnostics, themeVariable, range);
           }
         } else {
           // partial theme value validation just for hex colors
@@ -53,6 +47,7 @@ function _addDiagnostic(
           if (value && theme[value]) {
             const prop = theme[value];
             const range = convertRange(node.rangeBy({ word: value }));
+
             diagnostics.push({
               severity: DiagnosticSeverity.Error,
               message: `${prop} exists in theme file`,
@@ -69,6 +64,20 @@ function _addDiagnostic(
   } catch (err) {
     return [];
   }
+}
+
+function sendVariableDiagnostic(
+  diagnostics: Diagnostic[],
+  themeVariable: string,
+  range: Range
+) {
+  diagnostics.push({
+    severity: DiagnosticSeverity.Error,
+    message: `${themeVariable} exists in theme file`,
+    source: "vscode-language-scss",
+    data: VariableDiagnostic.create(range, themeVariable),
+    range,
+  });
 }
 
 function _addMixinDiagnostic(
@@ -126,6 +135,7 @@ export async function validateDocument(uri: string): Promise<Diagnostic[]> {
   if (!theme) return [];
   const diagnostics: Diagnostic[] = [];
   const enabledMixins = await asyncThemeMixinDiagnostics();
+  const spacingPrefix = await asyncThemeSpacingPrefix();
 
   const { record, mixins, files } = getThemeValues(theme.uri);
   if (
@@ -133,7 +143,7 @@ export async function validateDocument(uri: string): Promise<Diagnostic[]> {
     theme.uri !== uri &&
     !uri.includes("/node_modules/")
   ) {
-    _addDiagnostic(uri, record, diagnostics);
+    _addDiagnostic(uri, record, diagnostics, spacingPrefix);
     if (enabledMixins) {
       _addMixinDiagnostic(uri, mixins, diagnostics);
     }

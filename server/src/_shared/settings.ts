@@ -8,6 +8,7 @@ type Settings = {
     experimental: {
       themeDiagnosticsFile?: string | string[];
       themeMixinDiagnostics?: boolean;
+      themeSpacingPrefix?: string;
     };
   };
 };
@@ -37,6 +38,18 @@ export async function asyncThemeMixinDiagnostics() {
       section: "vscode-language-scss",
     });
     return settings.workspaceSettings?.experimental.themeMixinDiagnostics;
+  }
+}
+
+export async function asyncThemeSpacingPrefix() {
+  if (settings.workspaceSettings) {
+    return settings.workspaceSettings.experimental?.themeSpacingPrefix;
+  } else {
+    settings.workspaceSettings = await connection.workspace.getConfiguration({
+      scopeUri: settings.baseURL,
+      section: "vscode-language-scss",
+    });
+    return settings.workspaceSettings?.experimental.themeSpacingPrefix;
   }
 }
 

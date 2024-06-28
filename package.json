@@ -49,6 +49,12 @@
           "type": "boolean",
           "default": false,
           "description": "Enable experimental mixin theme diagnostics"
+        },
+        "vscode-language-scss.experimental.themeSpacingPrefix": {
+          "scope": "resource",
+          "type": "string",
+          "default": "",
+          "description": "Only show theme completions on padding, margin, and gap properties for this variable prefix (include $ in value)"
         }
       }
     }
