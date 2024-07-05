@@ -20,6 +20,7 @@ export async function getCompletions(
     const node = symbol.node;
     if (node.type === "decl" && node.variable) {
       const kind = validateColor(node.value) ? CIK.Color : CIK.Variable;
+      const sortText = getSortText(node.prop);
       completions.push({
         kind,
         label: node.prop,
@@ -28,6 +29,7 @@ export async function getCompletions(
           detail: ` ${node.value}`,
           description: basename(uri),
         },
+        sortText,
       });
     }
 
@@ -57,4 +59,12 @@ async function addThemeCompletion(completions: CompletionItem[], uri: string) {
     kind: CompletionItemKind.Snippet,
     insertText: `@use '${theme.src}' as *;`,
   });
+}
+
+function getSortText(label: string) {
+  const [, labelPrefix, digits] = label.match(/(.+)(\d+)$/) ?? [];
+  if (!digits?.length) {
+    return label;
+  }
+  return `${labelPrefix}${digits.padStart(5, "0")}`;
 }
