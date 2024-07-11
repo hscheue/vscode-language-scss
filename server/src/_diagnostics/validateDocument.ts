@@ -2,11 +2,7 @@ import { Diagnostic } from "vscode-languageserver";
 import { getThemeValues } from "./getThemeValues";
 import { getDocument } from "../_shared/getDocument";
 import { parse } from "postcss-scss";
-import {
-  asyncThemeMixinDiagnostics,
-  asyncThemeSpacingPrefix,
-  getThemeSrc,
-} from "../_shared/settings";
+import { asyncThemeSpacingPrefix, getThemeSrc } from "../_shared/settings";
 import {
   simpleMixinDiagnostic,
   simpleVariableDiagnostic,
@@ -16,7 +12,6 @@ export async function validateDocument(uri: string): Promise<Diagnostic[]> {
   const theme = await getThemeSrc(uri);
   if (!theme) return [];
   const diagnostics: Diagnostic[] = [];
-  const enabledMixins = await asyncThemeMixinDiagnostics();
   const spacingPrefix = await asyncThemeSpacingPrefix();
 
   const { record, mixins, files } = getThemeValues(theme.uri);
@@ -36,13 +31,11 @@ export async function validateDocument(uri: string): Promise<Diagnostic[]> {
         }
       });
 
-      if (enabledMixins) {
-        root.walk((node) => {
-          if (node.type === "rule") {
-            simpleMixinDiagnostic(node, mixins, diagnostics);
-          }
-        });
-      }
+      root.walk((node) => {
+        if (node.type === "rule") {
+          simpleMixinDiagnostic(node, mixins, diagnostics);
+        }
+      });
 
       return diagnostics;
     } catch (err) {
