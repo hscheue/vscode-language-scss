@@ -9,6 +9,7 @@ import {
   getThemeSrc,
 } from "../_shared/settings";
 import { MixinDiagnostic, VariableDiagnostic } from "../_commands/quickFix";
+import { Rule } from "postcss";
 
 function _addDiagnostic(
   uri: string,
@@ -92,41 +93,49 @@ function _addMixinDiagnostic(
 
     root.walk((node) => {
       if (node.type === "rule") {
-        const lines = new Set<string>();
-        node.nodes.forEach((n) => lines.add(n.toString()));
-
-        for (const mixin of mixins) {
-          const hasMixin = Object.keys(mixin.lines).every((line) => {
-            return lines.has(line);
-          });
-          if (hasMixin) {
-            const range = convertRange(node.rangeBy({ word: node.selector }));
-            if (!range) return;
-            const label = mixin.label;
-            diagnostics.push({
-              severity: DiagnosticSeverity.Error,
-              message: `${label} exists in theme file\n${Object.keys(
-                mixin.lines
-              ).join("\n")}`,
-              source: "vscode-language-scss",
-              data: MixinDiagnostic.create(
-                range,
-                label,
-                Object.keys(mixin.lines),
-                Object.keys(mixin.lines).map((word) => {
-                  return convertRange(node.rangeBy({ word }));
-                })
-              ),
-              range,
-            });
-          }
-        }
+        simpleMixinDiagnostic(node, mixins, diagnostics);
       }
     });
 
     return diagnostics;
   } catch (err) {
     return [];
+  }
+}
+
+function simpleMixinDiagnostic(
+  node: Rule,
+  mixins: { label: string; lines: Record<string, true> }[],
+  diagnostics: Diagnostic[]
+) {
+  const lines = new Set<string>();
+  node.nodes.forEach((n) => lines.add(n.toString()));
+
+  for (const mixin of mixins) {
+    const hasMixin = Object.keys(mixin.lines).every((line) => {
+      return lines.has(line);
+    });
+    if (hasMixin) {
+      const range = convertRange(node.rangeBy({ word: node.selector }));
+      if (!range) return;
+      const label = mixin.label;
+      diagnostics.push({
+        severity: DiagnosticSeverity.Error,
+        message: `${label} exists in theme file\n${Object.keys(
+          mixin.lines
+        ).join("\n")}`,
+        source: "vscode-language-scss",
+        data: MixinDiagnostic.create(
+          range,
+          label,
+          Object.keys(mixin.lines),
+          Object.keys(mixin.lines).map((word) => {
+            return convertRange(node.rangeBy({ word }));
+          })
+        ),
+        range,
+      });
+    }
   }
 }
 
