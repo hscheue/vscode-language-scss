@@ -12,51 +12,6 @@ import {
   simpleVariableDiagnostic,
 } from "./diagnostics-rules";
 
-function _addDiagnostic(
-  uri: string,
-  theme: Record<string, string>,
-  diagnostics: Diagnostic[],
-  spacingPrefix: string | undefined
-) {
-  const doc = getDocument(uri);
-  if (!doc) return;
-  try {
-    const root = parse(doc.getText());
-
-    root.walk((node) => {
-      if (node.type === "decl") {
-        simpleVariableDiagnostic(theme, node, diagnostics, spacingPrefix);
-      }
-    });
-
-    return diagnostics;
-  } catch (err) {
-    return [];
-  }
-}
-
-function _addMixinDiagnostic(
-  uri: string,
-  mixins: { label: string; lines: Record<string, true> }[],
-  diagnostics: Diagnostic[]
-) {
-  const doc = getDocument(uri);
-  if (!doc) return;
-  try {
-    const root = parse(doc.getText());
-
-    root.walk((node) => {
-      if (node.type === "rule") {
-        simpleMixinDiagnostic(node, mixins, diagnostics);
-      }
-    });
-
-    return diagnostics;
-  } catch (err) {
-    return [];
-  }
-}
-
 export async function validateDocument(uri: string): Promise<Diagnostic[]> {
   const theme = await getThemeSrc(uri);
   if (!theme) return [];
@@ -70,9 +25,28 @@ export async function validateDocument(uri: string): Promise<Diagnostic[]> {
     theme.uri !== uri &&
     !uri.includes("/node_modules/")
   ) {
-    _addDiagnostic(uri, record, diagnostics, spacingPrefix);
-    if (enabledMixins) {
-      _addMixinDiagnostic(uri, mixins, diagnostics);
+    const doc = getDocument(uri);
+    if (!doc) return [];
+    try {
+      const root = parse(doc.getText());
+
+      root.walk((node) => {
+        if (node.type === "decl") {
+          simpleVariableDiagnostic(record, node, diagnostics, spacingPrefix);
+        }
+      });
+
+      if (enabledMixins) {
+        root.walk((node) => {
+          if (node.type === "rule") {
+            simpleMixinDiagnostic(node, mixins, diagnostics);
+          }
+        });
+      }
+
+      return diagnostics;
+    } catch (err) {
+      return [];
     }
   }
 
