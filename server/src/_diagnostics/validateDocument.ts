@@ -11,10 +11,11 @@ import {
 export async function validateDocument(uri: string): Promise<Diagnostic[]> {
   const theme = await getThemeSrc(uri);
   if (!theme) return [];
+
   const diagnostics: Diagnostic[] = [];
   const spacingPrefix = await asyncThemeSpacingPrefix();
-
   const { record, mixins, files } = getThemeValues(theme.uri);
+
   if (
     !files.includes(uri) &&
     theme.uri !== uri &&
@@ -22,6 +23,7 @@ export async function validateDocument(uri: string): Promise<Diagnostic[]> {
   ) {
     const doc = getDocument(uri);
     if (!doc) return [];
+
     try {
       const root = parse(doc.getText());
 
@@ -29,9 +31,6 @@ export async function validateDocument(uri: string): Promise<Diagnostic[]> {
         if (node.type === "decl") {
           simpleVariableDiagnostic(record, node, diagnostics, spacingPrefix);
         }
-      });
-
-      root.walk((node) => {
         if (node.type === "rule") {
           simpleMixinDiagnostic(node, mixins, diagnostics);
         }
