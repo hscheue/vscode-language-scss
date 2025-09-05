@@ -63,7 +63,7 @@ export function getLinks(root: Root, baseURL: string, set: Set<string>) {
   root.walk((node) => {
     if (
       node.type === "atrule" &&
-      (node.name === "use" || node.name === "import")
+      (node.name === "use" || node.name === "import" || node.name === "forward")
     ) {
       const src = node.params.split('"')[1] ?? node.params.split("'")[1];
       if (!src) return;
